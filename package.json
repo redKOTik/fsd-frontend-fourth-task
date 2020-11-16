@@ -1,0 +1,61 @@
+{
+  "name": "slider-plugin",
+  "version": "1.0.0",
+  "description": "test-build",
+  "main": "app.ts",
+  "dependencies": {
+    "babel-plugin-const-enum": "0.0.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.8.3",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-transform-typescript": "^7.8.3",
+    "@babel/preset-env": "^7.8.3",
+    "@babel/preset-typescript": "^7.8.3",
+    "@testing-library/jest-dom": "^5.11.4",
+    "@types/jest": "^24.9.1",
+    "@types/jquery": "^3.3.31",
+    "@types/node": "^14.14.7",
+    "@types/webpack-env": "^1.15.0",
+    "@typescript-eslint/eslint-plugin": "^4.7.0",
+    "@typescript-eslint/parser": "^4.7.0",
+    "babel-loader": "^8.0.6",
+    "clean-webpack-plugin": "^3.0.0",
+    "copy-webpack-plugin": "^5.1.1",
+    "cross-env": "^6.0.3",
+    "css-loader": "^3.4.1",
+    "eslint": "^7.13.0",
+    "eslint-plugin-fsd": "^1.0.1",
+    "html-webpack-plugin": "^3.2.0",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^25.1.0",
+    "jest-puppeteer": "^4.4.0",
+    "jquery": "^3.4.1",
+    "mini-css-extract-plugin": "^0.9.0",
+    "optimize-css-assets-webpack-plugin": "^5.0.3",
+    "puppeteer": "^5.3.1",
+    "style-loader": "^1.1.2",
+    "terser-webpack-plugin": "^2.3.2",
+    "ts-jest": "^25.0.0",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.4",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.10.1"
+  },
+  "scripts": {
+    "test": "jest",
+    "dev": "cross-env NODE_ENV=development webpack --config ./webpack.config.js --mode development",
+    "build": "cross-env NODE_ENV=production webpack --config ./webpack.config.prod.js --mode production",
+    "start": "cross-env NODE_ENV=development webpack-dev-server --mode development --open",
+    "start-prod": "cross-env NODE_ENV=production webpack-dev-server --mode production --open",
+    "eslint": "eslint --cache --ext .js,.jsx,.ts,.tsx src"
+  },
+  "browserslist": "> 0.25%, not dead",
+  "keywords": [
+    "typescript",
+    "webpack"
+  ],
+  "author": "KiselevVictor",
+  "license": "ISC"
+}
