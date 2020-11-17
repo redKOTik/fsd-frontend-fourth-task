@@ -15,10 +15,11 @@ describe('Тестирование Вида: ', () => {
           showValue: false,
           showSettings: true,
           step: '5',
-          orientation: 'Gorizontal',
+          orientation: 'Horizontal',
           mode: 'Single',
           onValueChanged: undefined,
-          measurement: '₽'
+          measurement: '₽',
+          showScale: false
         };
 
         const wrapper: HTMLDivElement = document.createElement('div') as HTMLDivElement;

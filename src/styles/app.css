@@ -1,4 +1,4 @@
-.slider__gorizont {
+.slider__horizontal {
   min-width: 240px;
   height: 6px;
 }
@@ -41,9 +41,9 @@
   border-radius: 10px;
 }
 
-.slider__gorizont .thumb,
-.slider__gorizont .thumb__a,
-.slider__gorizont .thumb__b {
+.slider__horizontal .thumb,
+.slider__horizontal .thumb__a,
+.slider__horizontal .thumb__b {
   top: -6px;
 }
 
@@ -52,33 +52,6 @@
 .slider__vertical .thumb__b {
   left: -6px;
 }
-
-/* .thumb__a {
-  border-right: none;
-}
-.thumb__b {
-  border-left: none;
-} */
-
-/* .thumb:hover,
-.thumb__a:hover,
-.thumb__b:hover {
-  width: 1.1rem;
-  height: 1.1rem;
-  transition-duration: 5ms;
-}
-
-.slider__gorizont .thumb:hover,
-.slider__gorizont .thumb__a:hover,
-.slider__gorizont .thumb__b:hover
- {
-  top: -0.05rem;
-}
-.slider__vertical .thumb:hover,
-.slider__vertical .thumb__a:hover,
-.slider__vertical .thumb__b:hover {
-  left: -0.05rem;
-} */
 
 .container {
   display: flex;
@@ -112,7 +85,7 @@
   /* border-radius: 5px;
   background: linear-gradient(180deg, #6FCF97 0%, teal 100%); */
   /* background-color: teal; */
-
+  cursor: pointer;
   background: #ffffff;
   /* Dark 25% */
 
@@ -144,12 +117,13 @@
   background: linear-gradient(180deg, #6fcf97 0%, #66d2ea 100%);
   border-radius: 3px;
 
+  cursor: default;
   /* border: 1px solid steelblue;
   background-color: steelblue;
   border-radius: 0.3rem; */
 }
 
-.interval__gorizontal {
+.interval__horizontal {
   top: -1px;
   height: 6px;
 }
@@ -244,14 +218,20 @@
   outline-color: darkred;
   color: red;
 }
+.settings__info,
+.settings__scale {
+  width: 45%;
+}
 
-.settings__info input {
+.settings__info input,
+.settings__scale input {
   position: absolute;
   z-index: -1;
   opacity: 0;
 }
 
-.settings__info input + .instead_label {
+.settings__info input + .instead_label,
+.settings__scale input + .instead_label {
   position: relative;
   cursor: pointer;
   padding: 0 0 0 65px;
@@ -259,7 +239,8 @@
   line-height: 24px;
 }
 
-.settings__info input + .instead_label:before {
+.settings__info input + .instead_label:before,
+.settings__scale input + .instead_label:before {
   content: "";
   position: absolute;
   width: 40px;
@@ -271,7 +252,8 @@
   left: 15px;
 }
 
-.settings__info input + .instead_label:after {
+.settings__info input + .instead_label:after,
+.settings__scale input + .instead_label:after  {
   content: "";
   position: absolute;
   left: 20px;
@@ -283,19 +265,21 @@
   transition: 0.2s;
 }
 
-.settings__info input:checked + .instead_label:before {
+.settings__info input:checked + .instead_label:before,
+.settings__scale input:checked + .instead_label:before {
   border: 1px solid goldenrod;
   transition: 0.2s;
 }
 
-.settings__info input:checked + .instead_label:after {
+.settings__info input:checked + .instead_label:after,
+.settings__scale input:checked + .instead_label:after {
   left: 40px;
   top: 5px;
   background: rgb(68, 58, 0);
   transition: 0.2s;
 }
 
-.gorizontal_label,
+.horizontal_label,
 .vertical_label,
 .single_label,
 .multiple_label {
@@ -306,13 +290,13 @@
   color: #1f2041;
 }
 
-.view__gorizontal,
+.view__horizontal,
 .mode__single {
   position: absolute;
   z-index: -1;
   opacity: 0;
 }
-.view__gorizontal + .gorizontal_label,
+.view__horizontal + .horizontal_label,
 .mode__single + .single_label {
   position: relative;
   cursor: pointer;
@@ -321,7 +305,7 @@
   line-height: 24px;
 }
 
-.view__gorizontal + .gorizontal_label:before,
+.view__horizontal + .horizontal_label:before,
 .mode__single + .single_label:before {
   content: "";
   position: absolute;
@@ -334,7 +318,7 @@
   top: 0px;
 }
 
-.view__gorizontal + .gorizontal_label:after,
+.view__horizontal + .horizontal_label:after,
 .mode__single + .single_label:after {
   content: "";
   position: absolute;
@@ -348,12 +332,12 @@
   top: 5px;
 }
 
-.view__gorizontal:checked + .gorizontal_label:before,
+.view__horizontal:checked + .horizontal_label:before,
 .mode__single:checked + .single_label:before {
   border: 1px solid goldenrod;
 }
 
-.view__gorizontal:checked + .gorizontal_label:after,
+.view__horizontal:checked + .horizontal_label:after,
 .mode__single:checked + .single_label:after {
   opacity: 1;
 }
@@ -410,4 +394,31 @@
 .mode__multiple:checked + .multiple_label:after {
   opacity: 1;
   transition: 0.2s;
+}
+
+.scale {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+}
+
+.scale_horizontal {
+  width: 100%;
+  min-height: 20px;
+  margin-top: 10px;
+}
+
+.scale_vertical {
+  flex-direction: column;
+  height: 100%;
+  min-width: 20px;
+  margin-left: 10px;  
+}
+
+.scale__mark {
+  font-size: 11px;
+}
+
+.scale_vertical .scale__mark {
+  text-align: center;
 }

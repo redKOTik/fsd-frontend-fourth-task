@@ -14,10 +14,11 @@ describe('Тестирование модели: ', () => {
       showValue: false,
       showSettings: true,
       step: '5',
-      orientation: 'Gorizontal',
+      orientation: 'Horizontal',
       mode: 'Single',
       onValueChanged: undefined,
-      measurement: '₽'
+      measurement: '₽',
+      showScale: false
     };
 
     model = new Model(options);

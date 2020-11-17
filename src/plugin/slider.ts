@@ -15,7 +15,8 @@ import { Presentor } from '../plugin/mvp/presentor';
     orientation: 'Vertical',
     mode: 'Multiple',
     onValueChanged: undefined,
-    measurement: '₽'
+    measurement: '₽',
+    showScale: false
   }
 
   const methods: Methods = {

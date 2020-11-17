@@ -55,7 +55,7 @@
   $('#slider').sliderPlugin({
     step: '500',
     mode: 'Multiple',
-    orientation: 'Gorizontal',
+    orientation: 'Horizontal',
     defaultInterval: ['5000', '10000'],
     maximumValue: '15000',
     showSettings: false,
@@ -74,7 +74,7 @@
     minimumValue: string,
     maximumValue: string,
     step: string,
-    orientation: 'Vertical' | 'Gorizontal',
+    orientation: 'Vertical' | 'Horizontal',
     mode: 'Single' | 'Multiple',
     onValueChanged: Function | undefined;
     measurement: string

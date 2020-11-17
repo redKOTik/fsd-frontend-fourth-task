@@ -75,7 +75,7 @@ class Presentor {
           option = 'mode';
           value = target.value;
           break;
-        case 'view__gorizontal':
+        case 'view__horizontal':
         case 'view__vertical':
           option = 'orientation';
           value = target.value;
@@ -86,6 +86,12 @@ class Presentor {
             value = target.checked;
           }
           break;
+        case 'scale-input':
+          option = 'showScale';
+          if (target instanceof HTMLInputElement) {
+            value = target.checked;
+          }
+          break;  
         case 'values':
           option = 'defaultValue';
           value = target.value;

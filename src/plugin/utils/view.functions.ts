@@ -1,7 +1,7 @@
 import { Validator } from "./validator";
 
 const propsViewOptions: Array<string> = ['orientation', 'mode', 'step', 'minimumValue', 'maximumValue',
-  'defaultValue', 'defaultInterval', 'showValue', 'showSettings'];
+  'defaultValue', 'defaultInterval', 'showValue', 'showSettings', 'showScale'];
 
 // функции для создания и обновления вида слайдера
 function createSlider($view: JQuery, options: ViewOptions, delta: number): void {
@@ -11,12 +11,15 @@ function createSlider($view: JQuery, options: ViewOptions, delta: number): void 
   if (options.showValue) {
     initLabel($view, options);
   }
+  if (options.showScale) {
+    initScale($view, options);
+  }
   $view.addClass('slider');
 }
 
 function initOrientation($view: JQuery, orientation: Orientation): void {
-  orientation === 'Gorizontal'
-    ? $view.addClass('slider__gorizont')
+  orientation === 'Horizontal'
+    ? $view.addClass('slider__horizontal')
     : $view.addClass('slider__vertical');
 }
 function initMode($view: JQuery, options: ViewOptions): void {
@@ -26,8 +29,8 @@ function initMode($view: JQuery, options: ViewOptions): void {
     $view.append(thumb);
   } else {
     let interval: HTMLDivElement
-    if (options.orientation === 'Gorizontal') {
-      interval = createElement('div', ['interval', 'interval__gorizontal']) as HTMLDivElement;
+    if (options.orientation === 'Horizontal') {
+      interval = createElement('div', ['interval', 'interval__horizontal']) as HTMLDivElement;
     } else {
       interval = createElement('div', ['interval', 'interval__vertical']) as HTMLDivElement;
     }
@@ -45,13 +48,13 @@ function initThumb($view: JQuery, options: ViewOptions, delta: number): void {
   const orientation: Orientation = options.orientation;
   const mode: Mode = options.mode;
 
-  const offset = orientation === 'Gorizontal'
+  const offset = orientation === 'Horizontal'
     ? 'offsetWidth'
     : 'offsetHeight';
-  const style = orientation === 'Gorizontal'
+  const style = orientation === 'Horizontal'
     ? 'left'
     : 'top';
-  const interval = orientation === 'Gorizontal'
+  const interval = orientation === 'Horizontal'
     ? 'width'
     : 'height';
   const selector = mode === 'Single'
@@ -80,12 +83,12 @@ function initLabel($view: JQuery, options: ViewOptions): void {
   let labels: string[] = [];
 
   if (options.mode === 'Single') {
-    labels = options.orientation === 'Gorizontal'
+    labels = options.orientation === 'Horizontal'
       ? ['label__x']
       : ['label__y'];
     multipleCreate(labels[0], options.defaultValue, $view);
   } else {
-    labels = options.orientation === 'Gorizontal'
+    labels = options.orientation === 'Horizontal'
       ? ['label__ax', 'label__bx']
       : ['label__ay', 'label__by'];
     multipleCreate(labels[0], options.defaultInterval[0], $view);
@@ -97,7 +100,7 @@ function initLabel($view: JQuery, options: ViewOptions): void {
   }
 }
 function initStartPositionLabel(labels: string[], options: ViewOptions, $view: JQuery): void {
-  const style = options.orientation === 'Gorizontal'
+  const style = options.orientation === 'Horizontal'
     ? 'left'
     : 'top';
   const space = calcSpace($view, options);
@@ -114,8 +117,44 @@ function initStartPositionLabel(labels: string[], options: ViewOptions, $view: J
   }
 }
 
+function initScale($view: JQuery, options: ViewOptions): void {
+  if ($view.find('.scale').length !== 0) {
+    $view.find('.scale').remove();
+    return;
+  }
+
+  const scaleOrientation = options.orientation === "Horizontal" 
+    ? 'scale_horizontal' 
+    : 'scale_vertical';
+  const scale: HTMLDivElement = createElement('div', ['scale', scaleOrientation]) as HTMLDivElement;
+  createMarks(scale, options);
+  $view.append(scale);
+}
+
+function createMarks(scale: HTMLDivElement, options: ViewOptions): void {
+  const length = 5;
+  const interval = +options.maximumValue - +options.minimumValue;
+  const step = Math.floor(interval / length);
+
+  for(let i = 0; i <= length; i++) {
+    const span: HTMLSpanElement = createElement('span', 'scale__mark') as HTMLSpanElement;
+    if (i === length) {
+      span.textContent = options.maximumValue
+    } else {
+      span.textContent = (step * i + +options.minimumValue).toString();
+    }   
+    scale.insertAdjacentElement('beforeend', span);
+  }
+}
+
+function changeMarksValue($view: JQuery, options: ViewOptions) {
+  const $marksWrapper: JQuery<HTMLDivElement> = $view.find('.scale') as JQuery<HTMLDivElement>;
+  $marksWrapper.empty();
+  createMarks($marksWrapper[0], options);
+}
+
 function calcSpace($view: JQuery, options: ViewOptions): number {
-  const offset = options.orientation === 'Gorizontal'
+  const offset = options.orientation === 'Horizontal'
     ? 'offsetWidth'
     : 'offsetHeight';
   const selector = options.mode === 'Single'
@@ -151,9 +190,9 @@ function multipleCreate(label: string, value: string, $view: JQuery): void {
 }
 
 function changeLabelPosition($view: JQuery, options: ViewOptions, offset: [number] | [number, number], lastOffset?: string): void {
-  const orientation = options.orientation === 'Gorizontal'
+  const orientation = options.orientation === 'Horizontal'
     ? 'left' : 'top';
-  const axis = options.orientation === 'Gorizontal'
+  const axis = options.orientation === 'Horizontal'
     ? 'x' : 'y';
 
   if (options.mode === 'Single') {
@@ -184,7 +223,8 @@ function checkKey(key: string, data: ViewOptions, oldData: ViewOptions): boolean
     || key === 'step'
     || key === 'mode'
     || key === 'showValue'
-    || key === 'showSettings') {
+    || key === 'showSettings'
+    || key === 'showScale') {
     return data[key] !== oldData[key];
   } else {
     return false;
@@ -209,11 +249,11 @@ function clearAll($view: JQuery) {
   $view.off();
 }
 function toggleOrientation($view: JQuery): void {
-  $view.toggleClass('slider__gorizont slider__vertical');
+  $view.toggleClass('slider__horizontal slider__vertical');
 }
 
 function changeView($view: JQuery, data: ViewOptions, oldData: ViewOptions): number {
-  //Object.keys(data).forEach((key)
+  //Object.keys(data).forEach((key)  
   let code = 0;
   propsViewOptions.forEach((key) => {
     if (checkKey(key, data, oldData)) {
@@ -242,6 +282,9 @@ function changeView($view: JQuery, data: ViewOptions, oldData: ViewOptions): num
         case 'mode':
           code = updateFunctions.changeMode($view, data);
           return;
+        case 'showScale':
+          code = updateFunctions.changeScale($view, data);
+          return;  
         case 'step':
           return;
         case 'showValue':
@@ -255,11 +298,11 @@ function changeView($view: JQuery, data: ViewOptions, oldData: ViewOptions): num
 
 const updateFunctions = {
   changeDefaultValue: ($view: JQuery, options: ViewOptions): number => {
-    const orientation = options.orientation === 'Gorizontal'
+    const orientation = options.orientation === 'Horizontal'
       ? 'left' : 'top';
-    const offset = options.orientation === 'Gorizontal'
+    const offset = options.orientation === 'Horizontal'
       ? 'offsetWidth' : 'offsetHeight';
-    const size = options.orientation === 'Gorizontal'
+    const size = options.orientation === 'Horizontal'
       ? 'width' : 'height';
     const space = calcSpace($view, options);
     const delta = calcDelta(options);
@@ -292,6 +335,9 @@ const updateFunctions = {
     if (options.showValue) {
       changeLabelPosition($view, options, calcOffset($view, options));
     }
+    if (options.showScale) {
+      changeMarksValue($view, options);
+    }
     return 0;
   },
   changeOrientation: ($view: JQuery, options: ViewOptions): number => {
@@ -302,6 +348,8 @@ const updateFunctions = {
     initThumb($view, options, delta);
     if (options.showValue)
       initLabel($view, options);
+    if (options.showScale)
+      initScale($view, options)  
     return -1;
   },
   changeMode: ($view: JQuery, options: ViewOptions): number => {
@@ -311,10 +359,16 @@ const updateFunctions = {
     initThumb($view, options, delta);
     if (options.showValue)
       initLabel($view, options);
+    if (options.showScale)
+      initScale($view, options)    
     return -1;
   },
   changeShowValue: ($view: JQuery, options: ViewOptions): number => {
     initLabel($view, options);
+    return 0;
+  },
+  changeScale: ($view: JQuery, options: ViewOptions): number => {
+    initScale($view, options);
     return 0;
   }
 }
@@ -328,12 +382,18 @@ function createSettings(): HTMLDivElement {
                 <div class="instead_label">off/on labels</div>
             </label>
         </div>
+        <div class="settings__scale">
+            <label>
+                <input class="scale-input" type="checkbox">
+                <div class="instead_label">off/on scale</div>
+            </label>
+        </div>
         <div class="settings__view">
             <fieldset>
                 <legend>Вид слайдера</legend>
                 <label>
-                    <input class="view__gorizontal" type="radio" name="view" value="Gorizontal" />
-                    <div class="gorizontal_label">Горизонтально</div>
+                    <input class="view__horizontal" type="radio" name="view" value="Horizontal" />
+                    <div class="horizontal_label">Горизонтально</div>
                 </label>
                 <label>
                     <input class="view__vertical" type="radio" name="view" value="Vertical" />
@@ -378,6 +438,7 @@ function createSettings(): HTMLDivElement {
 
 function findElements(view: HTMLDivElement): {
   showValueInput: HTMLInputElement,
+  showScaleInput: HTMLInputElement,
   orientationInputs: NodeListOf<HTMLInputElement>,
   modeInputs: NodeListOf<HTMLInputElement>,
   stepInput: HTMLInputElement,
@@ -386,6 +447,7 @@ function findElements(view: HTMLDivElement): {
   divWithValue: HTMLDivElement
 } {
   const showValueInput: HTMLInputElement = view.querySelector('.settings__info input') as HTMLInputElement;
+  const showScaleInput: HTMLInputElement = view.querySelector('.settings__scale input') as HTMLInputElement;
   const orientationInputs: NodeListOf<HTMLInputElement> = view.querySelectorAll('.settings__view input');
   const modeInputs: NodeListOf<HTMLInputElement> = view.querySelectorAll('.settings__mode input');
   const stepInput: HTMLInputElement = view.querySelector('.settings__item .step') as HTMLInputElement;
@@ -395,6 +457,7 @@ function findElements(view: HTMLDivElement): {
 
   return {
     showValueInput,
+    showScaleInput,
     orientationInputs,
     modeInputs,
     stepInput,
@@ -429,6 +492,7 @@ function initValues(mode: Mode, values: HTMLInputElement[] | NodeListOf<HTMLInpu
 function setNewData(data: ViewOptions, prevData: ViewOptions, view: HTMLDivElement, $object: JQuery, validator: Validator): void {
   const {
     showValueInput,
+    showScaleInput,
     orientationInputs,
     modeInputs,
     stepInput,
@@ -448,6 +512,9 @@ function setNewData(data: ViewOptions, prevData: ViewOptions, view: HTMLDivEleme
         case 'showValue':
           showValueInput.checked = data.showValue;
           return;
+        case 'showScale':
+          showScaleInput.checked = data.showScale;
+          return;  
         case 'orientation':
           setNodeValue(orientationInputs, data.orientation);
           return;

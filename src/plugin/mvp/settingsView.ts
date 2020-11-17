@@ -39,6 +39,7 @@ class SettingsView implements ISettingsView {
   init(data: ViewOptions, view: HTMLDivElement): void {
     const {
       showValueInput,
+      showScaleInput,
       orientationInputs,
       modeInputs,
       stepInput,
@@ -49,6 +50,7 @@ class SettingsView implements ISettingsView {
     const siblings: HTMLDivElement = view.nextSibling as HTMLDivElement;
 
     showValueInput.checked = data.showValue;
+    showScaleInput.checked = data.showScale;
     setNodeValue(diversification(orientationInputs, siblings.id), data.orientation);
     setNodeValue(diversification(modeInputs, siblings.id), data.mode);
     stepInput.value = data.step;

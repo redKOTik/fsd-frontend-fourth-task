@@ -1,4 +1,4 @@
-type Orientation = 'Vertical' | 'Gorizontal';
+type Orientation = 'Vertical' | 'Horizontal';
 type Mode = 'Single' | 'Multiple';
 
 type ValueChanged = (event: CustomEvent, value: string) => void;
@@ -6,6 +6,7 @@ type ValueChanged = (event: CustomEvent, value: string) => void;
 type Options = {
   readonly showSettings?: boolean,
   showValue?: boolean,
+  showScale?: boolean,
   defaultValue?: string,
   defaultInterval?: [string, string],
   minimumValue?: string,
@@ -20,6 +21,7 @@ type Options = {
 type ViewOptions = {
   showSettings: boolean,
   showValue: boolean,
+  showScale: boolean,
   defaultValue: string,
   defaultInterval: [string, string],
   minimumValue: string,

@@ -44,6 +44,7 @@ class View implements IView {
   handler?: mouseHandler = (): void => undefined;
   handlers?: [mouseHandler, mouseHandler] = [(): void => undefined, (): void => undefined];
   lastSetOffset?: string; // 'A' or 'B'
+  activeMousedown = false;
 
   changeModalHandler: changeModalHandler = () => false;
 
@@ -61,10 +62,10 @@ class View implements IView {
   }
 
   private setShift(event: JQuery.MouseEventBase, thumb: JQuery<HTMLElement>) {
-    const prop = this.options.orientation === 'Gorizontal'
+    const prop = this.options.orientation === 'Horizontal'
       ? 'left'
       : 'top';
-    const client = this.options.orientation === 'Gorizontal'
+    const client = this.options.orientation === 'Horizontal'
       ? 'clientX'
       : 'clientY';
     const coordinates: JQuery.Coordinates | undefined = thumb.offset();
@@ -76,6 +77,8 @@ class View implements IView {
   initHandleChangeModel(handler: changeModalHandler): void {
     this.changeModalHandler = handler;
     const dummyHandler = () => false;
+
+    this.$view.on('click', this.onClick);
 
     if (this.options.mode === 'Single') {
       const $thumb = this.$view.find('.thumb');
@@ -95,6 +98,7 @@ class View implements IView {
     let handler: mouseHandler;
 
     const mousedownHandler = (event: JQuery.MouseEventBase) => {
+      this.activeMousedown = true;
       this.setShift(event, $thumb);
       const step = stepToPixel(this.space, this.delta, this.options);
       if (this.options.mode === 'Multiple') {
@@ -156,13 +160,13 @@ class View implements IView {
   }
 
   private onMouseMove = (options: handlerOptions, event: JQuery.MouseEventBase): void => {
-    const orient = this.options.orientation === 'Gorizontal'
+    const orient = this.options.orientation === 'Horizontal'
       ? 'left' : 'top';
-    const client = this.options.orientation === 'Gorizontal'
+    const client = this.options.orientation === 'Horizontal'
       ? 'clientX' : 'clientY';
-    const offset = this.options.orientation === 'Gorizontal'
+    const offset = this.options.orientation === 'Horizontal'
       ? 'offsetWidth' : 'offsetHeight';
-    const prop = this.options.orientation === 'Gorizontal'
+    const prop = this.options.orientation === 'Horizontal'
       ? 'width' : 'height';
 
     const { step, uniqueSpaceA, uniqueSpaceB } = options;
@@ -213,6 +217,49 @@ class View implements IView {
           this.changeModalHandler('interval__b', this.options.defaultInterval[1]);
         }
       }
+    }
+       
+    setTimeout(() => {
+      this.activeMousedown = false;
+    }, 0);
+  }
+
+  private onClick = (event: JQuery.MouseEventBase): void => {   
+    const selector = this.options.orientation === 'Horizontal' 
+      ? 'slider__horizontal'
+      : 'slider__vertical';
+
+    if (this.activeMousedown) {
+      return;
+    }
+      
+    const target: HTMLElement = event.target as HTMLElement;
+    
+    if (target.classList.contains(selector)) {      
+      const step = stepToPixel(this.space, this.delta, this.options);
+      if (this.options.mode === 'Multiple') {        
+        const $thumbB = this.$view.find('.thumb__b');
+        const offset = this.options.orientation === 'Horizontal'
+          ? 'offsetX' 
+          : 'offsetY';
+        const orient = this.options.orientation === 'Horizontal'
+          ? 'left' 
+          : 'top';
+        const valueA = valueToPixel(+this.options.defaultInterval[0], this.space, this.delta, this.options);
+        const valueB = valueToPixel(+this.options.defaultInterval[1], this.space, this.delta, this.options);
+        const spaceA = valueB - step;
+        const spaceB = this.space - valueA - step;        
+        if (event[offset] > +$thumbB.css(orient).slice(0,-2)) {
+          this.onMouseMove({ step, uniqueSpaceB: spaceB }, event);
+          this.changeModalHandler('interval__b', this.options.defaultInterval[1]);
+        } else {
+          this.onMouseMove({ step, uniqueSpaceA: spaceA }, event);
+          this.changeModalHandler('interval__a', this.options.defaultInterval[0]);
+        }        
+      } else {
+        this.onMouseMove({ step }, event);
+        this.changeModalHandler('defaultValue', this.options.defaultValue);
+      }      
     }
   }
 

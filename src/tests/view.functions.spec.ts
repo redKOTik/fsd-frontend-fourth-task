@@ -24,10 +24,11 @@ describe('Тестирование вспомогательных функций
           showValue: false,
           showSettings: true,
           step: '5',
-          orientation: 'Gorizontal',
+          orientation: 'Horizontal',
           mode: 'Single',
           onValueChanged: undefined,
-          measurement: '₽'
+          measurement: '₽',
+          showScale: false
         };
         
         document.body.innerHTML = '<div data-testid="wrapper"></div>';
@@ -49,7 +50,7 @@ describe('Тестирование вспомогательных функций
     });
 
     test('проверка функции: initOrientation', () => {
-        const selector = options.orientation === 'Gorizontal' ? 'slider__gorizont' : 'slider__vertical';               
+        const selector = options.orientation === 'Horizontal' ? 'slider__horizontal' : 'slider__vertical';               
         expect(view.$view.find(selector)).toBeDefined();
     });
 
@@ -59,7 +60,7 @@ describe('Тестирование вспомогательных функций
 
     test('проверка функции initMode во множественном режиме', () => {
         options.mode = 'Multiple';
-        const selector = options.orientation === 'Gorizontal' ? 'interval__gorizontal' : 'interval__vertical';
+        const selector = options.orientation === 'Horizontal' ? 'interval__horizontal' : 'interval__vertical';
         const $testWrapper = $(document.createElement('div') as HTMLDivElement);
         const testView = new View($testWrapper, options);
 

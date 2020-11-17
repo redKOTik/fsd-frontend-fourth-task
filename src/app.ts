@@ -6,7 +6,7 @@ const $slider = $('#slider');
 $slider.sliderPlugin({
   step: '500',
   mode: 'Multiple',
-  orientation: 'Gorizontal',
+  orientation: 'Horizontal',
   defaultInterval: ['5000', '10000'],
   maximumValue: '15000',
   showSettings: true,
@@ -21,8 +21,9 @@ console.log($slider.sliderPlugin('value'));
 $('#slider2').sliderPlugin({
   step: '5',
   mode: 'Single',
-  orientation: 'Gorizontal',
+  orientation: 'Vertical',
   defaultValue: '50',
+  showScale: true,
   onValueChanged: function (_, change) {
     console.log(change);
   }
@@ -31,8 +32,9 @@ $('#slider2').sliderPlugin({
 $('#slider3').sliderPlugin({
   step: '5',
   mode: 'Multiple',
-  orientation: 'Gorizontal',
+  orientation: 'Horizontal',
   defaultValue: '50',
+  showScale: true,
   onValueChanged: function (_, change) {
     console.log(change);
   }
@@ -52,7 +54,7 @@ $('#slider3').sliderPlugin({
 // }, 9000);
 
 // setTimeout(() => {
-//     $('#slider2').sliderPlugin('update', { defaultValue: '20' });
+//     $('#slider2').sliderPlugin('update', { showScale: false });
 // }, 10000);
 
 // setTimeout(() => {
