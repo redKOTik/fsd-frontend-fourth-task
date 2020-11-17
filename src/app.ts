@@ -21,9 +21,8 @@ console.log($slider.sliderPlugin('value'));
 $('#slider2').sliderPlugin({
   step: '5',
   mode: 'Single',
-  orientation: 'Vertical',
+  orientation: 'Horizontal',
   defaultValue: '50',
-  showScale: true,
   onValueChanged: function (_, change) {
     console.log(change);
   }
