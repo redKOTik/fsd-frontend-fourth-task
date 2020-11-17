@@ -4,38 +4,38 @@ import './plugin/slider';
 const $slider = $('#slider');
 
 $slider.sliderPlugin({
-    step: '500',
-    mode: 'Multiple',
-    orientation: 'Gorizontal',
-    defaultInterval: ['5000', '10000'],
-    maximumValue: '15000',
-    showSettings: true,
-    showValue: false,
-    onValueChanged: function (_, change) {
-        console.log(change);
-    }
+  step: '500',
+  mode: 'Multiple',
+  orientation: 'Gorizontal',
+  defaultInterval: ['5000', '10000'],
+  maximumValue: '15000',
+  showSettings: true,
+  showValue: false,
+  onValueChanged: function (_, change) {
+    console.log(change);
+  }
 });
 
 console.log($slider.sliderPlugin('value'));
 
 $('#slider2').sliderPlugin({
-    step: '5',
-    mode: 'Single',
-    orientation: 'Gorizontal',
-    defaultValue: '50',
-    onValueChanged: function (_, change) {
-        console.log(change);
-    }
+  step: '5',
+  mode: 'Single',
+  orientation: 'Gorizontal',
+  defaultValue: '50',
+  onValueChanged: function (_, change) {
+    console.log(change);
+  }
 });
 
 $('#slider3').sliderPlugin({
-    step: '5',
-    mode: 'Multiple',
-    orientation: 'Gorizontal',
-    defaultValue: '50',
-    onValueChanged: function (_, change) {
-        console.log(change);
-    }
+  step: '5',
+  mode: 'Multiple',
+  orientation: 'Gorizontal',
+  defaultValue: '50',
+  onValueChanged: function (_, change) {
+    console.log(change);
+  }
 });
 
 
