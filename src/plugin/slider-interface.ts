@@ -1,5 +1,10 @@
-type Orientation = 'Vertical' | 'Horizontal';
-type Mode = 'Single' | 'Multiple';
+type Vertical = 'Vertical' & string;
+type Horizontal = 'Horizontal' & string;
+type Orientation = Vertical | Horizontal;
+
+type Single = 'Single' & string;
+type Multiple = 'Multiple' & string;
+type Mode = Single | Multiple;
 
 type ValueChanged = (event: CustomEvent, value: string) => void;
 

@@ -1,3 +1,5 @@
+import EventEmmiter from "../utils/emmiter";
+
 interface IModel {
   readonly defaultValues: ViewOptions
   options: ViewOptions
@@ -18,34 +20,19 @@ type modelObserver = (data: ViewOptions, prevData: ViewOptions) => void;
 class Model implements IModel {
   defaultValues: ViewOptions;
   options: ViewOptions;
-  observers: (modelObserver)[];
 
-  constructor(options: ViewOptions) {
+  constructor(options: ViewOptions, public emmiter: EventEmmiter) {
     this.defaultValues = options;
     this.options = { ...this.defaultValues };
-
-    this.observers = [];
-  }
-
-  subscribe(observer: modelObserver): { unsubscribe: () => void } {
-    this.observers.push(observer);
-    return {
-      unsubscribe: (): void => {
-        this.observers = this.observers.filter(ob => ob != observer);
-      }
-    };
   }
 
   setData(content: Options): void {
     console.log('update model', content);
     const prevOptions = { ...this.options };
-    this.options = Object.assign({}, this.options, content);
-    if (this.observers.length > 0) {
-      this.observers.forEach(observer => observer(this.options, prevOptions));
-    }
+    this.options = Object.assign({}, this.options, content);    
   }
 
-  getDataModel(): Pick<Model, 'defaultValues' | 'options'> {
+  getModelData(): Pick<Model, 'defaultValues' | 'options'> {
     const { defaultValues, options } = { ...this };
     return {
       defaultValues,
@@ -82,6 +69,70 @@ class Model implements IModel {
     }
 
     console.log(`update model through ${source}`, this.options);
+  }
+
+  /////////////////////////////////////////////
+
+  updateInfoFromSettings(value: boolean): void {
+    this.options.showValue = value;
+    this.emmiter.dispatch('modal:setting-updated', {'showValue': this.options.showValue});
+  }
+
+  updateScaleFromSettings(value: boolean): void {
+    this.options.showScale = value;
+    this.emmiter.dispatch('modal:setting-updated', {'showScale': this.options.showScale});
+  }
+
+  updateValueFromScale(value: string): void {
+    if (this.options.mode === 'Multiple') {
+      if (this.options.defaultInterval.includes(value)) {
+        throw new Error('no change required');
+      }
+      this.options.defaultInterval[this.defineIndexMutableValue(value)] = value;
+      this.emmiter.dispatch('modal:value-changed', {'defaultInterval': this.options.defaultInterval});
+    } else {
+      this.options.defaultValue = value;
+      this.emmiter.dispatch('modal:value-changed', {'defaultValue': this.options.defaultValue});  
+    }
+  }
+
+  updateValueFromThumb(value: string, index: number): void {
+    if (this.options.mode === 'Multiple') {      
+      this.options.defaultInterval[index] = value;
+      this.emmiter.dispatch('modal:value-changed', {'defaultInterval': this.options.defaultInterval});
+    } else {
+      this.options.defaultValue = value;
+      this.emmiter.dispatch('modal:value-changed', {'defaultValue': this.options.defaultValue});  
+    }
+  }
+
+  defineValueFromPixel(position: number, step: number): string {
+    return `${Math.round(position / step * +this.options.step)}`;
+  }
+
+  defineIndexMutableValue(value: string): number {
+    const delta = (+this.options.defaultInterval[1] + +this.options.defaultInterval[0]) / 2;    
+    return +value >= delta ? 1 : 0; 
+  }
+
+  // view handlers
+
+  handleThumbMoved: (data: {[key: string]: any}) => void = (data: {[key: string]: any}) => {
+    this.updateValueFromThumb(this.defineValueFromPixel(data.position, data.space), data.index);
+  }
+
+  handleScaleClicked: (data: {[key: string]: any}) => void = (data: {[key: string]: any}) => {
+    this.updateValueFromScale(data.value);
+  }
+ 
+  // settings handlers
+
+  handleInfoChanged: (data: {[key: string]: any}) => void = (data: {[key: string]: any}) => {
+    this.updateInfoFromSettings(data.showValue);
+  }
+
+  handleScaleChanged: (data: {[key: string]: any}) => void = (data: {[key: string]: any}) => {
+    this.updateScaleFromSettings(data.showScale);
   }
 }
 

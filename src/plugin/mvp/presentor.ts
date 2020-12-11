@@ -1,3 +1,4 @@
+import EventEmmiter from '../utils/emmiter';
 import { Model } from './model';
 import { View, IView } from './view';
 import { SettingsView, ISettingsView } from './settingsView';
@@ -13,49 +14,60 @@ class Presentor {
   model: Model;
   view?: IView;
   settings?: ISettingsView;
-  unsub: { unsubscribe: () => void }[] = [];
 
-  constructor($object: JQuery, options: ViewOptions) {
-    this.model = new Model(options);
+  emmiter: EventEmmiter;
+  viewUnsubscribers: Unsubables[] = [];
+  settingsUnsubscribers: Unsubables[] = [];
 
-    this.initView($object);
-    this.initSettings($object, options);
-    this.subOnCustomEvents(options);
+  constructor(public $object: JQuery, public options: ViewOptions) {
+    this.emmiter = new EventEmmiter();    
+    this.model = new Model(this.options, this.emmiter);
+
+    this.initSettings();
+    this.initView();
+
+    this.subscribeOnSettingsEvents();
+    this.subscribeOnViewEvents();
+    this.subscribeOnModalEvents();    
+    this.subscribeOnCustomEvents();
   }
 
-  private initSettings($object: JQuery, options: ViewOptions) {
-    if (options.showSettings) {
-      this.settings = new SettingsView($object, this.model.getDefaultValues());
-      this.settings.view.addEventListener('change', this.handleChangeModelFromSettings);
-      this.unsub.push(this.model.subscribe(this.handleUpdateSettingsView));
-    }
-  }
-  private initView($object: JQuery) {
-    this.view = new View($object, this.model.getDataModel().options);
-    this.view.initHandleChangeModel(this.handleChangeModel);
-    this.unsub.push(this.model.subscribe(this.handleUpdateView));
+  private initSettings() {
+    if (this.options.showSettings)
+      this.settings = new SettingsView(this.$object, this.model.getDefaultValues(), this.emmiter);    
   }
 
-  private subOnCustomEvents(options: ViewOptions) {
-    if (typeof (options.onValueChanged) === 'function') {
-      this.view?.$view.on('valueChanged', options.onValueChanged);
-    }
+  private initView() {
+    this.view = new View(this.$object, this.model.getModelData().options, this.emmiter);
   }
 
-  destroy(): void {
-    this.view?.$view.removeClass().parent().html('');
-    this.unsub.forEach(o => o.unsubscribe());
-    this.view?.$view.off('valueChanged');
+  private subscribeOnViewEvents() {
+    this.viewUnsubscribers.push(this.emmiter.subscribe('view:thumb-moved', this.model.handleThumbMoved));
+    this.viewUnsubscribers.push(this.emmiter.subscribe('view:scale-clicked', this.model.handleScaleClicked));
   }
+
+  private subscribeOnModalEvents() {
+    if (this.view) {
+      this.viewUnsubscribers.push(this.emmiter.subscribe('modal:value-changed', this.view.handleValueChanged));
+      this.viewUnsubscribers.push(this.emmiter.subscribe('modal:setting-updated', this.view.handleViewChanged));    
+    }     
+  }  
+  
+  private subscribeOnSettingsEvents() {
+    if (this.options.showSettings && this.settings)
+      this.settingsUnsubscribers.push(this.emmiter.subscribe('setting:info-changed', this.model.handleInfoChanged));
+      this.settingsUnsubscribers.push(this.emmiter.subscribe('setting:scale-changed', this.model.handleScaleChanged));
+  }
+
+  private subscribeOnCustomEvents() {
+    if (typeof (this.options.onValueChanged) === 'function' && this.view)
+      this.view.$view.on('valueChanged', this.options.onValueChanged);
+  }  
 
   getModel(): Model {
     return this.model;
   }
 
-  handleChangeModel = (option: 'defaultValue' | 'interval__a' | 'interval__b',
-    value: string): void => {
-    this.model.updateData(option, value, 'view');
-  }
   handleUpdateView = (data: ViewOptions, oldData: ViewOptions): void => {
     this.view?.updateView(data, oldData);
   }
@@ -125,6 +137,12 @@ class Presentor {
       this.unsub.pop()?.unsubscribe();
     }
   }
+
+  destroy(): void {
+    this.view?.$view.removeClass().parent().html('');
+    this.viewUnsubscribers.forEach(unsubscriber => unsubscriber.unsubscribe());
+    this.view?.$view.off('valueChanged');
+  }
 }
 
-export { Presentor };
+export default Presentor;

@@ -2,33 +2,35 @@ import '@styles/app';
 import './plugin/slider';
 
 const $slider = $('#slider');
+const $slider3 = $('#slider3');
 
 $slider.sliderPlugin({
-  step: '500',
+  step: '50',
   mode: 'Multiple',
-  orientation: 'Horizontal',
-  defaultInterval: ['5000', '10000'],
-  maximumValue: '15000',
+  orientation: 'Vertical',
+  defaultValue: '550',
+  defaultInterval: ['150', '800'],
+  maximumValue: '1500',
   showSettings: true,
-  showValue: false,
+  showValue: true,
   onValueChanged: function (_, change) {
     console.log(change);
   }
 });
 
-console.log($slider.sliderPlugin('value'));
+// console.log($slider.sliderPlugin('value'));
 
-$('#slider2').sliderPlugin({
-  step: '5',
-  mode: 'Single',
-  orientation: 'Horizontal',
-  defaultValue: '50',
-  onValueChanged: function (_, change) {
-    console.log(change);
-  }
-});
+// $('#slider2').sliderPlugin({
+//   step: '5',
+//   mode: 'Single',
+//   orientation: 'Horizontal',
+//   defaultValue: '50',
+//   onValueChanged: function (_, change) {
+//     console.log(change);
+//   }
+// });
 
-$('#slider3').sliderPlugin({
+$slider3.sliderPlugin({
   step: '5',
   mode: 'Multiple',
   orientation: 'Horizontal',

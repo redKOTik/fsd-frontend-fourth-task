@@ -1,4 +1,4 @@
-import { Presentor } from '../plugin/mvp/presentor';
+import Presentor from '../plugin/mvp/presentor';
 
 (function ($) {
 

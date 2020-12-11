@@ -1,58 +1,3 @@
-.slider__horizontal {
-  min-width: 240px;
-  height: 6px;
-}
-
-.slider__vertical {
-  width: 6px;
-  height: 240px;
-}
-
-.label__x,
-.label__ax,
-.label__bx {
-  position: absolute;
-  top: -2rem;
-  font-size: 0.8em;
-}
-
-.label__y,
-.label__ay,
-.label__by {
-  position: absolute;
-  left: -2rem;
-  font-size: 0.8em;
-  line-height: 0em;
-}
-
-.thumb,
-.thumb__a,
-.thumb__b {
-  width: 16px;
-  height: 16px;
-  /* border: 1px solid steelblue;
-  border-radius: 1rem; */
-  outline: none;
-  position: absolute;
-  cursor: pointer;
-
-  background: linear-gradient(180deg, #6fcf97 0%, #66d2ea 100%);
-  border: 2px solid #ffffff;
-  border-radius: 10px;
-}
-
-.slider__horizontal .thumb,
-.slider__horizontal .thumb__a,
-.slider__horizontal .thumb__b {
-  top: -6px;
-}
-
-.slider__vertical .thumb,
-.slider__vertical .thumb__a,
-.slider__vertical .thumb__b {
-  left: -6px;
-}
-
 .container {
   display: flex;
   flex-wrap: wrap;
@@ -79,20 +24,7 @@
   display: flex;
 }
 
-.slider {
-  /* border: 2px solid #6FCF97; */
-  position: relative;
-  /* border-radius: 5px;
-  background: linear-gradient(180deg, #6FCF97 0%, teal 100%); */
-  /* background-color: teal; */
-  cursor: pointer;
-  background: #ffffff;
-  /* Dark 25% */
 
-  border: 1px solid rgba(31, 32, 65, 0.25);
-  box-sizing: border-box;
-  border-radius: 3px;
-}
 
 .slider_disabled {
   pointer-events: none;
@@ -112,26 +44,7 @@
   width: 190px;
 }
 
-.interval {
-  position: absolute;
-  background: linear-gradient(180deg, #6fcf97 0%, #66d2ea 100%);
-  border-radius: 3px;
 
-  cursor: default;
-  /* border: 1px solid steelblue;
-  background-color: steelblue;
-  border-radius: 0.3rem; */
-}
-
-.interval__horizontal {
-  top: -1px;
-  height: 6px;
-}
-
-.interval__vertical {
-  left: -1px;
-  width: 6px;
-}
 
 .settings__item {
   position: relative;
@@ -396,29 +309,157 @@
   transition: 0.2s;
 }
 
+/* ProgressBar */
+
+.progress-bar {
+  position: absolute;
+  background: linear-gradient(180deg, #6fcf97 0%, #66d2ea 100%);
+  border-radius: 3px;
+
+  cursor: default;
+}
+
+.slider__horizontal .progress-bar {
+  top: -1px;
+  height: 6px;
+}
+
+.slider__vertical .progress-bar {
+  left: -1px;
+  width: 6px;
+}
+
+/* Thumb */
+
+.thumb {
+  position: absolute;
+
+  width: 16px;
+  height: 16px;
+
+  outline: none;  
+  cursor: pointer;
+
+  background: linear-gradient(180deg, #6fcf97 0%, #66d2ea 100%);
+  border: 2px solid #ffffff;
+  border-radius: 10px;
+
+  z-index: 1;
+  
+}
+
+.thumb:focus {
+  border: 2px solid #06546b;  
+}
+
+.slider__horizontal .thumb {
+  top: -6px;
+}
+
+.slider__vertical .thumb {
+  left: -6px;
+}
+
+/* Label */
+
+.label {
+  position: absolute;
+  font-size: 0.8em;
+  user-select: none;
+  cursor: default;
+}
+
+.slider__horizontal .label {
+  top: -1.5rem;
+}
+
+/* Scale */
+
 .scale {
   position: relative;
   display: flex;
   justify-content: space-between;
+  cursor: default;  
 }
 
-.scale_horizontal {
+.slider__horizontal .scale {
   width: 100%;
-  min-height: 20px;
-  margin-top: 10px;
+  min-width: 240px;
+  min-height: 10px;
+  top: 15px;
+  left: -0.5px;
 }
 
-.scale_vertical {
+.slider__vertical .scale {
   flex-direction: column;
+  min-height: 240px;
   height: 100%;
-  min-width: 20px;
-  margin-left: 10px;  
+  min-width: 30px;
+  left: 15px;
+  top: -0.5px; 
 }
 
 .scale__mark {
-  font-size: 11px;
+  position: relative;
+  font-size: 11px;  
 }
 
-.scale_vertical .scale__mark {
+.scale__mark .mark-content {
+  position: relative;
+  cursor: pointer;
+  font-style: normal;  
+}
+
+.scale__mark::before {
+  position: absolute;
+  content: "";
+  background-color: #EDEDB0;
+}
+
+.slider__horizontal .scale__mark::before {
+  height: 6px;
+  width: 1px;
+  
+  top: -10px;
+  left: 0px; 
+}
+
+.slider__vertical .scale__mark {
   text-align: center;
 }
+
+.slider__vertical .mark-content {
+  top: -5.5px;
+}
+
+.slider__vertical .scale__mark::before {
+  height: 1px;
+  width: 6px;
+  
+  top: 0px;
+  left: -10px;
+}
+
+/* Workspace */
+
+.slider {
+  position: relative;
+  cursor: pointer;
+  background: #ffffff;
+
+  border: 1px solid rgba(31, 32, 65, 0.25);
+  box-sizing: border-box;
+  border-radius: 3px;
+}
+
+.slider__horizontal {
+  min-width: 240px;
+  height: 6px;
+}
+
+.slider__vertical {
+  width: 6px;
+  height: 100%;
+  min-height: 240px;
+}
+

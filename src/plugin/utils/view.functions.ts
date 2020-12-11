@@ -179,6 +179,15 @@ function stepBalancing(change: number, step: number): number {
 function valueToPixel(value: number, space: number, delta: number, options: ViewOptions): number {
   return Math.round(value * (space / delta) - (+options.minimumValue * (space / delta)));
 }
+
+function convStepNumberToPixel(step: number, unitMeasure: number): number {
+  return step * unitMeasure;
+}
+
+function convValueNumberToPixel(value: number, unitMeasure: number, minimumValue: number): number {
+  return Math.round((value * unitMeasure) - (minimumValue * unitMeasure));
+}
+
 function multipleCreate(label: string, value: string, $view: JQuery): void {
   if ($view.find('.' + label).length !== 0) {
     $view.find('.' + label).remove();
@@ -213,6 +222,7 @@ function changeLabelPosition($view: JQuery, options: ViewOptions, offset: [numbe
     }
   }
 }
+
 function checkKey(key: string, data: ViewOptions, oldData: ViewOptions): boolean {
   // eslint-disable-next-line fsd/split-conditionals
   if (key === 'defaultValue'
@@ -626,7 +636,12 @@ function createElement(tag: string, className?: string | string[]): HTMLElement 
 }
 
 export {
-  propsViewOptions, createSlider, calcSpace, calcDelta, stepToPixel,
+  propsViewOptions, createElement, createSlider, calcSpace, calcDelta, stepToPixel,
   stepBalancing, valueToPixel, changeLabelPosition, changeView,
   createSettings, findElements, setElementsForValues, initValues, setNewData, setNodeValue, diversification
 };
+
+export {
+  convValueNumberToPixel,
+  convStepNumberToPixel
+}

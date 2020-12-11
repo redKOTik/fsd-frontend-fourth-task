@@ -1,3 +1,4 @@
+import EventEmmiter from '../utils/emmiter';
 import { Validator } from '../utils/validator';
 
 import {
@@ -11,7 +12,7 @@ import {
 } from '../utils/view.functions';
 
 interface ISettingsView {
-  view: HTMLDivElement;
+  element: HTMLDivElement;
   updateSettingsView(dataModel: ViewOptions, prevData: ViewOptions): void;
 }
 
@@ -23,13 +24,14 @@ interface ISettingsView {
  * @param options
  */
 class SettingsView implements ISettingsView {
-  view: HTMLDivElement;
+  element: HTMLDivElement;
   validator: Validator;
-  constructor(public $object: JQuery, dataModel: ViewOptions) {
-    this.view = createSettings();
+  constructor(public $object: JQuery, dataModel: ViewOptions, public emmiter: EventEmmiter) {
+    this.element = createSettings();
     this.validator = new Validator();
-    this.render($object, this.view);
-    this.init(dataModel, this.view);
+    this.render($object, this.element);
+    this.init(dataModel, this.element);
+    this.onChangeSettings();
   }
 
   render($object: JQuery, view: HTMLDivElement): void {
@@ -57,6 +59,24 @@ class SettingsView implements ISettingsView {
     minInput.value = data.minimumValue;
     maxInput.value = data.maximumValue;
     initValues(data.mode, values, data.defaultValue, data.defaultInterval);
+  }
+
+  // handler
+  changeSettingsHandler: (event: Event) => void = (event: Event) => {
+    const target: HTMLElement = event.target as HTMLElement;
+    switch (target.className) {
+      case 'info':
+        this.emmiter.dispatch('setting:info-changed', { showValue: (<HTMLInputElement> target).checked });
+        return;
+      case 'scale-input':
+        this.emmiter.dispatch('setting:scale-changed', { showScale: (<HTMLInputElement> target).checked });
+        return; 
+    }
+  }
+
+  // set listener
+  onChangeSettings(): void {
+    this.element.addEventListener('change', this.changeSettingsHandler);
   }
 
   updateSettingsView(newDataModel: ViewOptions, prevData: ViewOptions): void {

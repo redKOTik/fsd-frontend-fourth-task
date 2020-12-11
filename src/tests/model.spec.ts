@@ -79,8 +79,8 @@ describe('Тестирование модели: ', () => {
     expect(copy).not.toBe(model.defaultValues);
   });
 
-  test('метод getDataModel должен возвращать новый объект, содержащий ссылки на свойства: options, defaultValues', () => {
-    const data: Pick<Model, 'defaultValues' | 'options'> = model.getDataModel();
+  test('метод getModelData должен возвращать новый объект, содержащий ссылки на свойства: options, defaultValues', () => {
+    const data: Pick<Model, 'defaultValues' | 'options'> = model.getModelData();
     //data.defaultValues.maximumValue = "99";
 
     expect(model.defaultValues).toEqual(data.defaultValues);
