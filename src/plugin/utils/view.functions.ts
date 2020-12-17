@@ -402,12 +402,12 @@ function createSettings(): HTMLDivElement {
             <fieldset>
                 <legend>Вид слайдера</legend>
                 <label>
-                    <input class="view__horizontal" type="radio" name="view" value="Horizontal" />
-                    <div class="horizontal_label">Горизонтально</div>
+                    <input class="view" type="radio" name="view" value="Horizontal" />
+                    <div class="label">Горизонтально</div>
                 </label>
                 <label>
-                    <input class="view__vertical" type="radio" name="view" value="Vertical" />
-                    <div class="vertical_label">Вертикально</div>
+                    <input class="view" type="radio" name="view" value="Vertical" />
+                    <div class="label">Вертикально</div>
                 </label>                
             </fieldset>
         </div>
@@ -415,12 +415,12 @@ function createSettings(): HTMLDivElement {
             <fieldset>
                 <legend>Режим</legend>
                 <label>
-                    <input class="mode__single" type="radio" name="mode" value="Single" />
-                    <div class="single_label">Single</div>
+                    <input class="mode" type="radio" name="mode" value="Single" />
+                    <div class="label">Single</div>
                 </label>
                 <label>
-                    <input class="mode__multiple" type="radio" name="mode" value="Multiple" />
-                    <div class="multiple_label">Multiple</div>
+                    <input class="mode" type="radio" name="mode" value="Multiple" />
+                    <div class="label">Multiple</div>
                 </label>                
             </fieldset>            
         </div>
@@ -438,8 +438,8 @@ function createSettings(): HTMLDivElement {
         <div class="settings__item">
             <fieldset>
             <legend>Границы</legend>
-            <input class="minimum" name="minimum" type="text" placeholder="Минимальное значение">
-            <input class="maximum" name="maximum" type="text" placeholder="Максимальное значение"></fieldset>
+            <input class="range" name="minimum" type="text" placeholder="Минимальное значение">
+            <input class="range" name="maximum" type="text" placeholder="Максимальное значение"></fieldset>
         </div>`;
   const divSettings: HTMLDivElement = createElement('div', 'settings') as HTMLDivElement;
   divSettings.insertAdjacentHTML('afterbegin', htmlSettings);
@@ -461,8 +461,8 @@ function findElements(view: HTMLDivElement): {
   const orientationInputs: NodeListOf<HTMLInputElement> = view.querySelectorAll('.settings__view input');
   const modeInputs: NodeListOf<HTMLInputElement> = view.querySelectorAll('.settings__mode input');
   const stepInput: HTMLInputElement = view.querySelector('.settings__item .step') as HTMLInputElement;
-  const minInput: HTMLInputElement = view.querySelector('.settings__item .minimum') as HTMLInputElement;
-  const maxInput: HTMLInputElement = view.querySelector('.settings__item .maximum') as HTMLInputElement;
+  const minInput: HTMLInputElement = view.querySelector('.settings__item .range[name="minimum"]') as HTMLInputElement;
+  const maxInput: HTMLInputElement = view.querySelector('.settings__item .range[name="maximum"]') as HTMLInputElement;
   const divWithValue: HTMLDivElement = view.querySelector('.settings__values fieldset') as HTMLDivElement;
 
   return {

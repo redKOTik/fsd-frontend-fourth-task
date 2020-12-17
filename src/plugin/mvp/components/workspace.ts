@@ -10,14 +10,19 @@ import {
 
 
 interface IWorkspace {
-  computeSpace(): this;
+  computeSpace(minimum: number): this;
   computeStep(step: number): this;
 }
 
 class Workspace extends Component implements IWorkspace {
   element: HTMLDivElement;
-  space = 0;
-  step = 0;  
+  space: OwnSpace = {
+    start: 0, // начальная точка пространства (px) 
+    end: 0 // конечная точнка пространства (px)
+  };
+  step = 0; // шаг (px)
+  delta = 0; // числовая разница (max - min)
+
 
   constructor(type: Orientation, mode: Mode, public thumbs: Thumb[], public progressBar: ProgressBar, public scale: Scale) {
     super(type, mode);
@@ -28,14 +33,25 @@ class Workspace extends Component implements IWorkspace {
     return createElement('div', ['slider', `slider__${key.toLowerCase()}`]) as HTMLDivElement;
   }
 
-  computeSpace(): this {
-    this.space = this.element[this.styleKeys.offset] - 2;
+  getUnitMeasure(): number {
+    return this.space.end / this.delta;
+  }
+
+  setDelta(delta: number): this {
+    this.delta = delta;
     return this;
   }
+
+  computeSpace(minimum: number): this {
+    this.space.end = this.element[this.styleKeys.offset] - 2;
+    this.space.start = this.space.end / this.delta * minimum;
+    return this;
+  }
+
   computeStep(step: number): this {
     this.step = step;
     return this;
-  }
+  }  
 
   renderThumbOnWorkspace(): this {
     this.thumbs.forEach(thumb => {
@@ -69,17 +85,17 @@ class Workspace extends Component implements IWorkspace {
     return newOffsetPosition;
   }
     
-  computeOwnSpace(index: number, options: HandleOptions): void { 
+  computeOwnSpace(index: number, options: HandleOptions): void {
     index === 0 
       ? options.ownSpace = { 
-        start: 0, 
-        end: this.thumbs[0].isMultiple() 
-          ? this.thumbs[1].value - this.step + this.thumbs[0].getSize() / 2
-          : this.space
+        start: this.space.start, 
+        end: this.thumbs[0].isMultiple()
+          ? this.thumbs[1].value - this.step + this.thumbs[0].getSize() / 2 + this.space.start
+          : this.space.end + this.space.start
         }
       : options.ownSpace = { 
-        start: this.thumbs[0].value + this.step + this.thumbs[0].getSize() / 2, 
-        end: this.space
+        start: this.space.start + this.thumbs[0].value + this.step + this.thumbs[0].getSize() / 2, 
+        end: this.space.end + this.space.start
       };
   }  
 
@@ -127,6 +143,14 @@ class Workspace extends Component implements IWorkspace {
   //     .changeProgressBarSizeAndPosition(index, newOffsetPosition)
   //     .changeLabelPositionAndValue(index, newOffsetPosition);
   // }
+
+  destroy(): this {
+    const $workspace = $(this.element).parent().find(this.element);
+    $workspace.length !== 0
+      ? $workspace.remove()
+      : false;
+    return this;
+  }
 }
 
 export default Workspace;

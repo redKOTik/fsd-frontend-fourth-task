@@ -20,14 +20,30 @@ type ChangedValue = {
 };
 
 type ChangedOption = {
-  [key: string]: boolean;
+  [key: string]: boolean
 }
+
+type ChangedModeOption = {
+  [key: string]: Mode
+}
+
+type ChangedTypeOption = {
+  [key: string]: Orientation
+}
+
+type ChangedRangeOption = {
+  [key: string]: string
+}
+
 
 interface IView {
   $view: JQuery;
   component: Workspace;
   handleValueChanged: (data: ChangedValue) => void;
   handleViewChanged: (data: ChangedOption) => void;
+  handleModeChanged: (data: ChangedModeOption) => void;
+  handleTypeChanged: (data: ChangedTypeOption) => void;
+  handleRangeChanged: (data: ChangedRangeOption) => void;
 }
 
 /**
@@ -41,25 +57,28 @@ class View implements IView {
   options: ViewOptions;
   component: Workspace;
 
-  delta: number;
-
   constructor(public $view: JQuery, options: ViewOptions, public emmitter: EventEmmiter) {
     this.options = {
       ...options,
       defaultInterval: [...options.defaultInterval] as [string, string]
     };
+    this.component = this.createView();
+  }
 
-    this.delta = calcDelta(options);
-
-    this.component = this.createComponents(options);
+  createView(): Workspace {
+    if (this.component)
+      this.component.destroy();
+      
+    this.component = this.createComponents(this.options);
     this.component
       .renderProgressBarOnWorkspace()
       .renderThumbOnWorkspace()
-      .renderScaleOnWorkspace(options.showScale);
-    this.addComponentToDomStructure($view);
-    this.initComponents(options);
-
+      .renderScaleOnWorkspace(this.options.showScale);
+    this.addComponentToDomStructure(this.$view);
+    this.initComponents(this.options);
     this.addEventListeners();
+
+    return this.component;
   }
 
   createComponents(options: ViewOptions): Workspace {
@@ -90,11 +109,12 @@ class View implements IView {
 
   initWorkspace(options: ViewOptions): void {
     this.component
-      .computeSpace()
+      .setDelta(calcDelta(options))
+      .computeSpace(+options.minimumValue)
       .computeStep(
         convStepNumberToPixel(
           +options.step,
-          this.component.space / this.delta)
+          this.component.getUnitMeasure())
       );
   }
 
@@ -104,7 +124,7 @@ class View implements IView {
       .setOnElementDefaultPosition(
         convValueNumberToPixel(
           +value,
-          this.component.space / this.delta,
+          this.component.getUnitMeasure(),
           +options.minimumValue))
       .checkShowValue(options.showValue)
       .onDragStartHandler()
@@ -118,7 +138,8 @@ class View implements IView {
 
   initScaleElement(options: ViewOptions): void {
     this.component.scale
-      .createMarks(options)
+      .createMarks()
+      .initMarks(options)
       .addMarksToScale();
   }
 
@@ -157,13 +178,13 @@ class View implements IView {
   }
 
   mousemoveHandler: HandleEvent = (options: HandleOptions, event: MouseEvent) => {
-    const { shift, index } = options;
+    const { shift, index } = options;    
     this.component.computeOwnSpace(index, options);
-        
-    const position = event[this.component.styleKeys.client] - shift - this.component.getPropValueFromCoordinates(this.component.element);
+            
+    const position = this.component.space.start + event[this.component.styleKeys.client] - shift - this.component.getPropValueFromCoordinates(this.component.element); // start + clickEvent.clientX - shift - workspace.offsetLeft
     const newOffsetPosition = this.component.computeNewOffsetPosition(position, options);
     this.component.thumbs[index].setOnElementDefaultPosition(newOffsetPosition);
-    this.emmitter.dispatch('view:thumb-moved', { position: newOffsetPosition, index, space: this.component.step });
+    this.emmitter.dispatch('view:thumb-moved', { position: newOffsetPosition, index, step: this.component.step });
   }
 
   // set listeners
@@ -173,10 +194,10 @@ class View implements IView {
   }
 
   onMousedownThumbHandler(thumb: Thumb, mousemoveHandler: HandleEvent, context: Workspace): void {
-    thumb.element.addEventListener('mousedown', thumb.makeMouseDownHandler(mousemoveHandler, context));
+    thumb.setMouseDownHandler(thumb.makeMouseDownHandler(mousemoveHandler, context));
+    thumb.element.addEventListener('mousedown', thumb.mouseDownHandler);
   }
-
-
+  
   // private onClick = (event: JQuery.MouseEventBase): void => {   
   //   const selector = this.options.orientation === 'Horizontal' 
   //     ? 'slider__horizontal'
@@ -225,13 +246,45 @@ class View implements IView {
     this.component.renderScaleOnWorkspace(this.options.showScale);
   }
 
+  toggleSetting(): void {
+    this.createView();
+  }
+
+  reInitThumbs(): void {
+    this.component.thumbs.forEach(thumb => {      
+      this.initThumbElement(thumb, thumb.element.value, this.options);
+    });
+  }
+
+  reInitScale(): void {
+    this.initScaleElement(this.options);
+  }
+
+  reInitProgressBar():void {
+    this.initProgressBarElement();
+  }
+  
+  reHangEventListeners(): void {
+    this.component.thumbs.forEach(thumb => {
+      thumb.element.removeEventListener('mousedown', thumb.mouseDownHandler)
+      this.onMousedownThumbHandler(thumb, this.mousemoveHandler, this.component);
+    });
+  }
+
+  changeViewFromRange(): void {
+    this.reInitThumbs();
+    this.reInitProgressBar();
+    this.reInitScale();
+    //this.reHangEventListeners();
+  }
+
   updateThumb(thumb: Thumb, value: string): void {
     thumb
       .setOnElementDefaultValue(value)
       .setOnElementDefaultPosition(
         convValueNumberToPixel(
           +value,
-          this.component.space / this.delta,
+          this.component.getUnitMeasure(),
           +this.options.minimumValue))
       .initLabel()
   }
@@ -239,7 +292,7 @@ class View implements IView {
   handleValueChanged: (data: ChangedValue) => void = (data: ChangedValue) => {
     switch (Object.keys(data)[0]) {
       case 'defaultValue':
-        this.options.defaultValue = data['defaulValue'] as string;
+        this.options.defaultValue = data['defaultValue'] as string;
         this.updateThumb(this.component.thumbs[0], this.options.defaultValue);
         break;
       case 'defaultInterval':
@@ -263,6 +316,24 @@ class View implements IView {
         this.toggleShowScaleSetting();
         return;
     }
+  }
+
+  handleModeChanged: (data: ChangedModeOption) => void = (data: ChangedModeOption) => {
+    this.options.mode = data.mode;
+    this.toggleSetting();
+  }
+
+  handleTypeChanged: (data: ChangedTypeOption) => void = (data: ChangedTypeOption) => {
+    this.options.orientation = data.view;
+    this.toggleSetting();
+  }
+
+  handleRangeChanged: (data: ChangedRangeOption) => void = (data: ChangedRangeOption) => {
+    data.minimumValue 
+      ? this.options.minimumValue = data.minimumValue 
+      : this.options.maximumValue = data.maximumValue;
+    this.initWorkspace(this.options);
+    this.changeViewFromRange();
   }
 }
 

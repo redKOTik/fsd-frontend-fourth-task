@@ -29,6 +29,14 @@ class ProgressBar extends Component {
     this.size = defaultSize;
     return this;
   }
+
+  destroy(): this {
+    const $progressBar = $(this.element).parent().find(this.element);
+    $progressBar.length !== 0
+      ? $progressBar.remove()
+      : false;
+    return this;
+  }
 }
 
 export default ProgressBar;

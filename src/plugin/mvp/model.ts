@@ -83,6 +83,21 @@ class Model implements IModel {
     this.emmiter.dispatch('modal:setting-updated', {'showScale': this.options.showScale});
   }
 
+  updateModeFromSettings(value: Mode): void {
+    this.options.mode = value;
+    this.emmiter.dispatch('modal:mode-updated', {'mode': this.options.mode});
+  }
+
+  updateTypeFromSettings(value: Orientation): void {
+    this.options.orientation = value;
+    this.emmiter.dispatch('modal:type-updated', {'view': this.options.orientation});
+  }
+
+  updateRangeFromSettings(value: string, tag: 'minimumValue' | 'maximumValue'): void {
+    this.options[tag] = value;
+    this.emmiter.dispatch('modal:range-updated', { [tag]: this.options[tag]});
+  }
+
   updateValueFromScale(value: string): void {
     if (this.options.mode === 'Multiple') {
       if (this.options.defaultInterval.includes(value)) {
@@ -118,7 +133,7 @@ class Model implements IModel {
   // view handlers
 
   handleThumbMoved: (data: {[key: string]: any}) => void = (data: {[key: string]: any}) => {
-    this.updateValueFromThumb(this.defineValueFromPixel(data.position, data.space), data.index);
+    this.updateValueFromThumb(this.defineValueFromPixel(data.position, data.step), data.index);
   }
 
   handleScaleClicked: (data: {[key: string]: any}) => void = (data: {[key: string]: any}) => {
@@ -133,6 +148,18 @@ class Model implements IModel {
 
   handleScaleChanged: (data: {[key: string]: any}) => void = (data: {[key: string]: any}) => {
     this.updateScaleFromSettings(data.showScale);
+  }
+
+  handleModeChanged: (data: {[key: string]: any}) => void = (data: {[key: string]: any}) => {
+    this.updateModeFromSettings(data.mode);
+  }
+
+  handleTypeChanged: (data: {[key: string]: any}) => void = (data: {[key: string]: any}) => {
+    this.updateTypeFromSettings(data.view);
+  }
+
+  handleRangeChanged: (data: {[key: string]: any}) => void = (data: {[key: string]: any}) => {
+    this.updateRangeFromSettings(data.value, data.tag);
   }
 }
 

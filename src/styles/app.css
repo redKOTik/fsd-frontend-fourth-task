@@ -51,8 +51,7 @@
 }
 
 .step,
-.minimum,
-.maximum,
+.range,
 .values,
 .interval__a,
 .interval__b {
@@ -192,10 +191,8 @@
   transition: 0.2s;
 }
 
-.horizontal_label,
-.vertical_label,
-.single_label,
-.multiple_label {
+.view + .label,
+.mode + .label {
   font: 12px Georgia;
   line-height: 15px;
   margin-bottom: 5px;
@@ -203,14 +200,15 @@
   color: #1f2041;
 }
 
-.view__horizontal,
-.mode__single {
+.view,
+.mode {
   position: absolute;
   z-index: -1;
   opacity: 0;
 }
-.view__horizontal + .horizontal_label,
-.mode__single + .single_label {
+
+.view + .label,
+.mode + .label {
   position: relative;
   cursor: pointer;
   padding: 0 0 0 50px;
@@ -218,8 +216,8 @@
   line-height: 24px;
 }
 
-.view__horizontal + .horizontal_label:before,
-.mode__single + .single_label:before {
+.view + .label:before,
+.mode + .label:before {
   content: "";
   position: absolute;
   width: 20px;
@@ -231,8 +229,8 @@
   top: 0px;
 }
 
-.view__horizontal + .horizontal_label:after,
-.mode__single + .single_label:after {
+.view + .label:after,
+.mode + .label:after {
   content: "";
   position: absolute;
   width: 12px;
@@ -245,66 +243,14 @@
   top: 5px;
 }
 
-.view__horizontal:checked + .horizontal_label:before,
-.mode__single:checked + .single_label:before {
-  border: 1px solid goldenrod;
-}
-
-.view__horizontal:checked + .horizontal_label:after,
-.mode__single:checked + .single_label:after {
-  opacity: 1;
-}
-
-.view__vertical,
-.mode__multiple {
-  position: absolute;
-  z-index: -1;
-  opacity: 0;
-}
-.view__vertical + .vertical_label,
-.mode__multiple + .multiple_label {
-  position: relative;
-  cursor: pointer;
-  padding: 0 0 0 50px;
-  font: 14px Georgia;
-  line-height: 24px;
-}
-
-.view__vertical + .vertical_label:before,
-.mode__multiple + .multiple_label:before {
-  content: "";
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border: 1px solid rgba(31, 32, 65, 0.25);
-  border-radius: 50%;
-  background: #ffffff;
-  left: 15px;
-  top: 0px;
-}
-
-.view__vertical + .vertical_label:after,
-.mode__multiple + .multiple_label:after {
-  content: "";
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  background: linear-gradient(180deg, goldenrod 0%, rgb(68, 58, 0) 100%);
-  border-radius: 50%;
-  opacity: 0;
-  transition: 0.2s;
-  left: 20px;
-  top: 5px;
-}
-
-.view__vertical:checked + .vertical_label:before,
-.mode__multiple:checked + .multiple_label:before {
+.view:checked + .label:before,
+.mode:checked + .label:before {
   border: 1px solid goldenrod;
   transition: 0.2s;
 }
 
-.view__vertical:checked + .vertical_label:after,
-.mode__multiple:checked + .multiple_label:after {
+.view:checked + .label:after,
+.mode:checked + .label:after {
   opacity: 1;
   transition: 0.2s;
 }

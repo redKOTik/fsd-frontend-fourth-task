@@ -70,7 +70,15 @@ class SettingsView implements ISettingsView {
         return;
       case 'scale-input':
         this.emmiter.dispatch('setting:scale-changed', { showScale: (<HTMLInputElement> target).checked });
+        return;
+      case 'mode':
+        this.emmiter.dispatch('setting:mode-changed', { mode: (<HTMLInputElement> target).value });
+        return;
+      case 'view':
+        this.emmiter.dispatch('setting:type-changed', { view: (<HTMLInputElement> target).value });
         return; 
+      case'range':
+        this.emmiter.dispatch('setting:range-changed', {value: (<HTMLInputElement> target).value, tag: `${(<HTMLInputElement> target).name}Value` });
     }
   }
 

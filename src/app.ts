@@ -31,8 +31,9 @@ $slider.sliderPlugin({
 // });
 
 $slider3.sliderPlugin({
+  minimumValue: '-20',
   step: '5',
-  mode: 'Multiple',
+  mode: 'Single',
   orientation: 'Horizontal',
   defaultValue: '50',
   showScale: true,

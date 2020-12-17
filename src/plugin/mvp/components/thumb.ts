@@ -12,8 +12,10 @@ class Thumb extends Component {
   label: Label;
   value = 0; // px
   activeMousedown = false;
+  activeDragStart = false;
 
-  mouseMoveHandler: (event: MouseEvent) => void = () => false;
+  mouseDownHandler: MouseHandler = () => false;
+  mouseMoveHandler: MouseHandler = () => false;
   mouseUpHadler: () => void = () => {
     document.removeEventListener('mouseup', this.mouseUpHadler);
     document.removeEventListener('mousemove', this.mouseMoveHandler);
@@ -51,7 +53,9 @@ class Thumb extends Component {
   }
 
   renderLabel(): this {
-    this.element.insertAdjacentElement('beforebegin', this.label.element);
+    const $label = $(this.element).parent().find(this.label.element);
+    if ($label.length === 0)
+      this.element.insertAdjacentElement('beforebegin', this.label.element);
     return this;      
   }  
   
@@ -86,7 +90,11 @@ class Thumb extends Component {
     return this.element.dataset.order && this.element.dataset.order === 'second' ? 1 : 0; 
   }
 
-  makeMouseDownHandler(mouseMoveHandler: HandleEvent, context: Workspace): (event: MouseEvent) => void {
+  setMouseDownHandler(handler: MouseHandler): void {
+    this.mouseDownHandler = handler;
+  }
+
+  makeMouseDownHandler(mouseMoveHandler: HandleEvent, context: Workspace): MouseHandler {
     return (event: MouseEvent) => {
       this.activeMousedown = true;
       const index = this.computeThumbIndex();
@@ -105,7 +113,9 @@ class Thumb extends Component {
   }
 
   onDragStartHandler(dragStartHandler = () => false): this {
-    this.element.addEventListener('dragstart', dragStartHandler);
+    if (!this.activeDragStart)
+      this.element.addEventListener('dragstart', dragStartHandler);
+      this.activeDragStart = true;
     return this;
   }
 
@@ -113,6 +123,14 @@ class Thumb extends Component {
     setTimeout(() => {
       this.activeMousedown = false;
     }, 0);
+  }
+
+  destroy(): this {
+    const $thumb = $(this.element).parent().find(this.element);
+    $thumb.length !== 0
+      ? $thumb.remove()
+      : false;
+    return this;
   }
 }
 
