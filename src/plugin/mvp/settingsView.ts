@@ -63,22 +63,29 @@ class SettingsView implements ISettingsView {
 
   // handler
   changeSettingsHandler: (event: Event) => void = (event: Event) => {
-    const target: HTMLElement = event.target as HTMLElement;
+    const target: HTMLInputElement = event.target as HTMLInputElement;
     switch (target.className) {
       case 'info':
-        this.emmiter.dispatch('setting:info-changed', { showValue: (<HTMLInputElement> target).checked });
+        this.emmiter.dispatch('setting:info-changed', { showValue: target.checked });
         return;
       case 'scale-input':
-        this.emmiter.dispatch('setting:scale-changed', { showScale: (<HTMLInputElement> target).checked });
+        this.emmiter.dispatch('setting:scale-changed', { showScale: target.checked });
         return;
       case 'mode':
-        this.emmiter.dispatch('setting:mode-changed', { mode: (<HTMLInputElement> target).value });
+        this.emmiter.dispatch('setting:mode-changed', { mode: target.value });
         return;
       case 'view':
-        this.emmiter.dispatch('setting:type-changed', { view: (<HTMLInputElement> target).value });
+        this.emmiter.dispatch('setting:type-changed', { view: target.value });
         return; 
       case'range':
-        this.emmiter.dispatch('setting:range-changed', {value: (<HTMLInputElement> target).value, tag: `${(<HTMLInputElement> target).name}Value` });
+        this.emmiter.dispatch('setting:range-changed', {value: target.value, tag: `${target.name}Value` });
+        return;
+      case 'step':
+        this.emmiter.dispatch('setting:step-changed', { step: target.value });
+        return;
+      case 'values':
+        this.emmiter.dispatch('setting:value-changed', { value: target.value, index: target.dataset.order });
+        return;      
     }
   }
 

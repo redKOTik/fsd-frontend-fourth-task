@@ -75,27 +75,32 @@ class Model implements IModel {
 
   updateInfoFromSettings(value: boolean): void {
     this.options.showValue = value;
-    this.emmiter.dispatch('modal:setting-updated', {'showValue': this.options.showValue});
+    this.emmiter.dispatch('model:setting-updated', {'showValue': this.options.showValue});
   }
 
   updateScaleFromSettings(value: boolean): void {
     this.options.showScale = value;
-    this.emmiter.dispatch('modal:setting-updated', {'showScale': this.options.showScale});
+    this.emmiter.dispatch('model:setting-updated', {'showScale': this.options.showScale});
   }
 
   updateModeFromSettings(value: Mode): void {
     this.options.mode = value;
-    this.emmiter.dispatch('modal:mode-updated', {'mode': this.options.mode});
+    this.emmiter.dispatch('model:mode-updated', {'mode': this.options.mode});
   }
 
   updateTypeFromSettings(value: Orientation): void {
     this.options.orientation = value;
-    this.emmiter.dispatch('modal:type-updated', {'view': this.options.orientation});
+    this.emmiter.dispatch('model:type-updated', {'view': this.options.orientation});
   }
 
   updateRangeFromSettings(value: string, tag: 'minimumValue' | 'maximumValue'): void {
     this.options[tag] = value;
-    this.emmiter.dispatch('modal:range-updated', { [tag]: this.options[tag]});
+    this.emmiter.dispatch('model:range-updated', { [tag]: this.options[tag]});
+  }
+
+  updateStepFromSettings(value: string): void {
+    this.options.step = value;
+    this.emmiter.dispatch('model:step-updated', { step: this.options.step});
   }
 
   updateValueFromScale(value: string): void {
@@ -104,20 +109,20 @@ class Model implements IModel {
         throw new Error('no change required');
       }
       this.options.defaultInterval[this.defineIndexMutableValue(value)] = value;
-      this.emmiter.dispatch('modal:value-changed', {'defaultInterval': this.options.defaultInterval});
+      this.emmiter.dispatch('model:value-changed', {'defaultInterval': this.options.defaultInterval});
     } else {
       this.options.defaultValue = value;
-      this.emmiter.dispatch('modal:value-changed', {'defaultValue': this.options.defaultValue});  
+      this.emmiter.dispatch('model:value-changed', {'defaultValue': this.options.defaultValue});  
     }
   }
 
   updateValueFromThumb(value: string, index: number): void {
     if (this.options.mode === 'Multiple') {      
       this.options.defaultInterval[index] = value;
-      this.emmiter.dispatch('modal:value-changed', {'defaultInterval': this.options.defaultInterval});
+      this.emmiter.dispatch('model:value-changed', {'defaultInterval': this.options.defaultInterval});
     } else {
       this.options.defaultValue = value;
-      this.emmiter.dispatch('modal:value-changed', {'defaultValue': this.options.defaultValue});  
+      this.emmiter.dispatch('model:value-changed', {'defaultValue': this.options.defaultValue});  
     }
   }
 
@@ -133,7 +138,8 @@ class Model implements IModel {
   // view handlers
 
   handleThumbMoved: (data: {[key: string]: any}) => void = (data: {[key: string]: any}) => {
-    this.updateValueFromThumb(this.defineValueFromPixel(data.position, data.step), data.index);
+    const value = data.value ? data.value as string : this.defineValueFromPixel(data.position, data.step);
+    this.updateValueFromThumb(value, +data.index);
   }
 
   handleScaleClicked: (data: {[key: string]: any}) => void = (data: {[key: string]: any}) => {
@@ -160,6 +166,10 @@ class Model implements IModel {
 
   handleRangeChanged: (data: {[key: string]: any}) => void = (data: {[key: string]: any}) => {
     this.updateRangeFromSettings(data.value, data.tag);
+  }
+
+  handleStepChanged: (data: {[key: string]: any}) => void = (data: {[key: string]: any}) => {
+    this.updateStepFromSettings(data.step);
   }
 }
 

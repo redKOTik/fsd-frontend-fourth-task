@@ -35,6 +35,10 @@ type ChangedRangeOption = {
   [key: string]: string
 }
 
+type ChangedStepOption = {
+  [key: string]: string
+}
+
 
 interface IView {
   $view: JQuery;
@@ -44,6 +48,7 @@ interface IView {
   handleModeChanged: (data: ChangedModeOption) => void;
   handleTypeChanged: (data: ChangedTypeOption) => void;
   handleRangeChanged: (data: ChangedRangeOption) => void;
+  handleStepChanged: (data: ChangedStepOption) => void;
 }
 
 /**
@@ -111,7 +116,7 @@ class View implements IView {
     this.component
       .setDelta(calcDelta(options))
       .computeSpace(+options.minimumValue)
-      .computeStep(
+      .setStep(
         convStepNumberToPixel(
           +options.step,
           this.component.getUnitMeasure())
@@ -196,46 +201,10 @@ class View implements IView {
   onMousedownThumbHandler(thumb: Thumb, mousemoveHandler: HandleEvent, context: Workspace): void {
     thumb.setMouseDownHandler(thumb.makeMouseDownHandler(mousemoveHandler, context));
     thumb.element.addEventListener('mousedown', thumb.mouseDownHandler);
-  }
-  
-  // private onClick = (event: JQuery.MouseEventBase): void => {   
-  //   const selector = this.options.orientation === 'Horizontal' 
-  //     ? 'slider__horizontal'
-  //     : 'slider__vertical';
+  }  
 
-  //   if (this.activeMousedown) {
-  //     return;
-  //   }
+  // methods view update
 
-  //   const target: HTMLElement = event.target as HTMLElement;
-
-  //   if (target.classList.contains(selector)) {      
-  //     const step = stepToPixel(this.space, this.delta, this.options);
-  //     if (this.options.mode === 'Multiple') {        
-  //       const $thumbB = this.$view.find('.thumb__b');
-  //       const offset = this.options.orientation === 'Horizontal'
-  //         ? 'offsetX' 
-  //         : 'offsetY';
-  //       const orient = this.options.orientation === 'Horizontal'
-  //         ? 'left' 
-  //         : 'top';
-  //       const valueA = valueToPixel(+this.options.defaultInterval[0], this.space, this.delta, this.options);
-  //       const valueB = valueToPixel(+this.options.defaultInterval[1], this.space, this.delta, this.options);
-  //       const spaceA = valueB - step;
-  //       const spaceB = this.space - valueA - step;        
-  //       if (event[offset] > +$thumbB.css(orient).slice(0,-2)) {
-  //         this.onMouseMove({ step, uniqueSpaceB: spaceB }, event);
-  //         this.changeModalHandler('interval__b', this.options.defaultInterval[1]);
-  //       } else {
-  //         this.onMouseMove({ step, uniqueSpaceA: spaceA }, event);
-  //         this.changeModalHandler('interval__a', this.options.defaultInterval[0]);
-  //       }        
-  //     } else {
-  //       this.onMouseMove({ step }, event);
-  //       this.changeModalHandler('defaultValue', this.options.defaultValue);
-  //     }      
-  //   }
-  // }
   toggleShowValueSetting(): void {
     this.component.thumbs.forEach(thumb => {      
       thumb.checkShowValue(this.options.showValue);
@@ -334,6 +303,14 @@ class View implements IView {
       : this.options.maximumValue = data.maximumValue;
     this.initWorkspace(this.options);
     this.changeViewFromRange();
+  }
+
+  handleStepChanged: (data: ChangedStepOption) => void = (data: ChangedRangeOption) => {
+    this.options.step = data.step;
+    this.component.setStep(
+      convStepNumberToPixel(
+        +this.options.step,
+        this.component.getUnitMeasure()));  
   }
 }
 

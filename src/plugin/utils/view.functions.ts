@@ -1,173 +1,9 @@
 import { Validator } from "./validator";
 
-const propsViewOptions: Array<string> = ['orientation', 'mode', 'step', 'minimumValue', 'maximumValue',
-  'defaultValue', 'defaultInterval', 'showValue', 'showSettings', 'showScale'];
-
-// функции для создания и обновления вида слайдера
-function createSlider($view: JQuery, options: ViewOptions, delta: number): void {
-  initOrientation($view, options.orientation);
-  initMode($view, options);
-  initThumb($view, options, delta);
-  if (options.showValue) {
-    initLabel($view, options);
-  }
-  if (options.showScale) {
-    initScale($view, options);
-  }
-  $view.addClass('slider');
-}
-
-function initOrientation($view: JQuery, orientation: Orientation): void {
-  orientation === 'Horizontal'
-    ? $view.addClass('slider__horizontal')
-    : $view.addClass('slider__vertical');
-}
-function initMode($view: JQuery, options: ViewOptions): void {
-  if (options.mode === 'Single') {
-    const thumb: HTMLButtonElement = createElement('button', 'thumb') as HTMLButtonElement;
-    thumb.value = options.defaultValue;
-    $view.append(thumb);
-  } else {
-    let interval: HTMLDivElement
-    if (options.orientation === 'Horizontal') {
-      interval = createElement('div', ['interval', 'interval__horizontal']) as HTMLDivElement;
-    } else {
-      interval = createElement('div', ['interval', 'interval__vertical']) as HTMLDivElement;
-    }
-    const thumbA: HTMLButtonElement = createElement('button', 'thumb__a') as HTMLButtonElement;
-    thumbA.value = options.defaultInterval[0];
-    const thumbB: HTMLButtonElement = createElement('button', 'thumb__b') as HTMLButtonElement;
-    thumbB.value = options.defaultInterval[1];
-    $view.append(interval);
-    $view.append(thumbA);
-    $view.append(thumbB);
-  }
-}
-function initThumb($view: JQuery, options: ViewOptions, delta: number): void {
-
-  const orientation: Orientation = options.orientation;
-  const mode: Mode = options.mode;
-
-  const offset = orientation === 'Horizontal'
-    ? 'offsetWidth'
-    : 'offsetHeight';
-  const style = orientation === 'Horizontal'
-    ? 'left'
-    : 'top';
-  const interval = orientation === 'Horizontal'
-    ? 'width'
-    : 'height';
-  const selector = mode === 'Single'
-    ? '.thumb'
-    : '.thumb__a';
-  const space = calcSpace($view, options);
-
-  const valueA = valueToPixel(+options.defaultInterval[0], space, delta, options);
-  const valueB = valueToPixel(+options.defaultInterval[1], space, delta, options);
-
-  switch (mode) {
-    case 'Single':
-      $view.find('.thumb')[0].style[style] = (valueToPixel(+options.defaultValue, space, delta, options)).toString() + 'px';
-      break;
-    case 'Multiple':
-      $view.find('.thumb__a')[0].style[style] = valueA.toString() + 'px';
-      $view.find('.thumb__b')[0].style[style] = valueB.toString() + 'px';
-
-      $view.find('.interval')[0].style[interval] = (valueB - valueA).toString() + 'px';
-      $view.find('.interval')[0].style[style] = ((valueA) + $view.find(selector)[0][offset] / 2).toString() + 'px';
-      break;
-  }
-}
-function initLabel($view: JQuery, options: ViewOptions): void {
-  const onLabels = options.showValue;
-  let labels: string[] = [];
-
-  if (options.mode === 'Single') {
-    labels = options.orientation === 'Horizontal'
-      ? ['label__x']
-      : ['label__y'];
-    multipleCreate(labels[0], options.defaultValue, $view);
-  } else {
-    labels = options.orientation === 'Horizontal'
-      ? ['label__ax', 'label__bx']
-      : ['label__ay', 'label__by'];
-    multipleCreate(labels[0], options.defaultInterval[0], $view);
-    multipleCreate(labels[1], options.defaultInterval[1], $view);
-  }
-
-  if (onLabels) {
-    initStartPositionLabel(labels, options, $view);
-  }
-}
-function initStartPositionLabel(labels: string[], options: ViewOptions, $view: JQuery): void {
-  const style = options.orientation === 'Horizontal'
-    ? 'left'
-    : 'top';
-  const space = calcSpace($view, options);
-  const delta = calcDelta(options);
-
-  switch (options.mode) {
-    case 'Single':
-      $view.find('.' + labels[0])[0].style[style] = valueToPixel(+options.defaultValue, space, delta, options).toString() + 'px';
-      break;
-    case 'Multiple':
-      $view.find('.' + labels[0])[0].style[style] = valueToPixel(+options.defaultInterval[0], space, delta, options).toString() + 'px';
-      $view.find('.' + labels[1])[0].style[style] = valueToPixel(+options.defaultInterval[1], space, delta, options).toString() + 'px';
-      break;
-  }
-}
-
-function initScale($view: JQuery, options: ViewOptions): void {
-  if ($view.find('.scale').length !== 0) {
-    $view.find('.scale').remove();
-    return;
-  }
-
-  const scaleOrientation = options.orientation === "Horizontal" 
-    ? 'scale_horizontal' 
-    : 'scale_vertical';
-  const scale: HTMLDivElement = createElement('div', ['scale', scaleOrientation]) as HTMLDivElement;
-  createMarks(scale, options);
-  $view.append(scale);
-}
-
-function createMarks(scale: HTMLDivElement, options: ViewOptions): void {
-  const length = 5;
-  const interval = +options.maximumValue - +options.minimumValue;
-  const step = Math.floor(interval / length);
-
-  for(let i = 0; i <= length; i++) {
-    const span: HTMLSpanElement = createElement('span', 'scale__mark') as HTMLSpanElement;
-    if (i === length) {
-      span.textContent = options.maximumValue
-    } else {
-      span.textContent = (step * i + +options.minimumValue).toString();
-    }   
-    scale.insertAdjacentElement('beforeend', span);
-  }
-}
-
-function changeMarksValue($view: JQuery, options: ViewOptions) {
-  const $marksWrapper: JQuery<HTMLDivElement> = $view.find('.scale') as JQuery<HTMLDivElement>;
-  $marksWrapper.empty();
-  createMarks($marksWrapper[0], options);
-}
-
-function calcSpace($view: JQuery, options: ViewOptions): number {
-  const offset = options.orientation === 'Horizontal'
-    ? 'offsetWidth'
-    : 'offsetHeight';
-  const selector = options.mode === 'Single'
-    ? '.thumb'
-    : '.thumb__a';
-  return $view[0][offset] - $view.find(selector)[0][offset] - 2;
-}
 function calcDelta(options: ViewOptions): number {
   return +options.maximumValue - +options.minimumValue;
 }
-function stepToPixel(space: number, delta: number, options: ViewOptions): number {
-  return +options.step * (space / delta);
-}
+
 function stepBalancing(change: number, step: number): number {
   const balance = change % step;
   if (step / 2 <= balance) {
@@ -176,9 +12,6 @@ function stepBalancing(change: number, step: number): number {
     return change - balance;
   }
 }
-function valueToPixel(value: number, space: number, delta: number, options: ViewOptions): number {
-  return Math.round(value * (space / delta) - (+options.minimumValue * (space / delta)));
-}
 
 function convStepNumberToPixel(step: number, unitMeasure: number): number {
   return step * unitMeasure;
@@ -186,201 +19,6 @@ function convStepNumberToPixel(step: number, unitMeasure: number): number {
 
 function convValueNumberToPixel(value: number, unitMeasure: number, minimumValue: number): number {
   return Math.round((value * unitMeasure) - (minimumValue * unitMeasure));
-}
-
-function multipleCreate(label: string, value: string, $view: JQuery): void {
-  if ($view.find('.' + label).length !== 0) {
-    $view.find('.' + label).remove();
-    return;
-  }
-  const pValue: HTMLParagraphElement = createElement('p', ['label', label]) as HTMLParagraphElement;
-  pValue.textContent = value;
-  $view.append(pValue);
-}
-
-function changeLabelPosition($view: JQuery, options: ViewOptions, offset: [number] | [number, number], lastOffset?: string): void {
-  const orientation = options.orientation === 'Horizontal'
-    ? 'left' : 'top';
-  const axis = options.orientation === 'Horizontal'
-    ? 'x' : 'y';
-
-  if (options.mode === 'Single') {
-    $view.find('.label__' + axis)[0].style[orientation] = offset[0].toString() + 'px';
-    $view.find('.label__' + axis)[0].textContent = options.defaultValue;
-  } else {
-    if (lastOffset && lastOffset === 'A') {
-      $view.find('.label__a' + axis)[0].style[orientation] = offset[0].toString() + 'px';
-      $view.find('.label__a' + axis)[0].textContent = options.defaultInterval[0];
-    } else if (lastOffset && lastOffset === 'B') {
-      $view.find('.label__b' + axis)[0].style[orientation] = offset[0].toString() + 'px';
-      $view.find('.label__b' + axis)[0].textContent = options.defaultInterval[1];
-    } else {
-      $view.find('.label__a' + axis)[0].style[orientation] = offset[0].toString() + 'px';
-      $view.find('.label__a' + axis)[0].textContent = options.defaultInterval[0];
-      $view.find('.label__b' + axis)[0].style[orientation] = offset[1] ? offset[1].toString() + 'px' : '0px';
-      $view.find('.label__b' + axis)[0].textContent = options.defaultInterval[1];
-    }
-  }
-}
-
-function checkKey(key: string, data: ViewOptions, oldData: ViewOptions): boolean {
-  // eslint-disable-next-line fsd/split-conditionals
-  if (key === 'defaultValue'
-    || key === 'minimumValue'
-    || key === 'maximumValue'
-    || key === 'orientation'
-    || key === 'defaultInterval'
-    || key === 'step'
-    || key === 'mode'
-    || key === 'showValue'
-    || key === 'showSettings'
-    || key === 'showScale') {
-    return data[key] !== oldData[key];
-  } else {
-    return false;
-  }
-}
-
-function calcOffset($view: JQuery, options: ViewOptions): [number] | [number, number] {
-  const space = calcSpace($view, options);
-  const delta = calcDelta(options);
-
-  if (options.mode === 'Single') {
-    const newOffset = valueToPixel(+options.defaultValue, space, delta, options);
-    return [newOffset];
-  } else {
-    const offsetA = valueToPixel(+options.defaultInterval[0], space, delta, options);
-    const offsetB = valueToPixel(+options.defaultInterval[1], space, delta, options);
-    return [offsetA, offsetB];
-  }
-}
-function clearAll($view: JQuery) {
-  $view.empty();
-  $view.off();
-}
-function toggleOrientation($view: JQuery): void {
-  $view.toggleClass('slider__horizontal slider__vertical');
-}
-
-function changeView($view: JQuery, data: ViewOptions, oldData: ViewOptions): number {
-  //Object.keys(data).forEach((key)  
-  let code = 0;
-  propsViewOptions.forEach((key) => {
-    if (checkKey(key, data, oldData)) {
-      switch (key) {
-        case 'defaultValue':
-        case 'defaultInterval':
-          updateFunctions.changeDefaultValue($view, data);
-          if (typeof (data.onValueChanged) === 'function') {
-            const measurement = data.measurement ? data.measurement : '';
-            let values = '';
-            if (data.mode === 'Single') {
-              values = data.defaultValue + measurement
-            } else {
-              values = data.defaultInterval[0] + measurement + ' - ' + data.defaultInterval[1] + measurement
-            }
-            $view.trigger('valueChanged', values);
-          }
-          return;
-        case 'minimumValue':
-        case 'maximumValue':
-          updateFunctions.changeLimitValues($view, data);
-          return;
-        case 'orientation':
-          code = updateFunctions.changeOrientation($view, data);
-          return;
-        case 'mode':
-          code = updateFunctions.changeMode($view, data);
-          return;
-        case 'showScale':
-          code = updateFunctions.changeScale($view, data);
-          return;  
-        case 'step':
-          return;
-        case 'showValue':
-          updateFunctions.changeShowValue($view, data);
-          return;
-      }
-    }
-  });
-  return code;
-}
-
-const updateFunctions = {
-  changeDefaultValue: ($view: JQuery, options: ViewOptions): number => {
-    const orientation = options.orientation === 'Horizontal'
-      ? 'left' : 'top';
-    const offset = options.orientation === 'Horizontal'
-      ? 'offsetWidth' : 'offsetHeight';
-    const size = options.orientation === 'Horizontal'
-      ? 'width' : 'height';
-    const space = calcSpace($view, options);
-    const delta = calcDelta(options);
-    const newOffset = valueToPixel(+options.defaultValue, space, delta, options);
-
-    if (options.mode === 'Single') {
-      $view.find('.thumb')[0].style[orientation] = newOffset.toString() + 'px';
-      if (options.showValue) {
-        changeLabelPosition($view, options, [newOffset]);
-      }
-    } else {
-      const offsetA = valueToPixel(+options.defaultInterval[0], space, delta, options);
-      const offsetB = valueToPixel(+options.defaultInterval[1], space, delta, options);
-
-      $view.find('.interval')[0].style[orientation] = (offsetA + $view.find('.thumb__a')[0][offset] / 2).toString() + 'px';
-      $view.find('.interval')[0].style[size] = (offsetB - offsetA).toString() + 'px';
-      $view.find('.thumb__a')[0].style[orientation] = offsetA.toString() + 'px';
-      $view.find('.thumb__b')[0].style[orientation] = offsetB.toString() + 'px';
-      if (options.showValue) {
-        changeLabelPosition($view, options, [offsetA, offsetB]);
-      }
-      return offsetB;
-    }
-
-    return newOffset;
-  },
-  changeLimitValues: ($view: JQuery, options: ViewOptions): number => {
-    const delta = calcDelta(options);
-    initThumb($view, options, delta);
-    if (options.showValue) {
-      changeLabelPosition($view, options, calcOffset($view, options));
-    }
-    if (options.showScale) {
-      changeMarksValue($view, options);
-    }
-    return 0;
-  },
-  changeOrientation: ($view: JQuery, options: ViewOptions): number => {
-    clearAll($view);
-    toggleOrientation($view);
-    initMode($view, options);
-    const delta = calcDelta(options);
-    initThumb($view, options, delta);
-    if (options.showValue)
-      initLabel($view, options);
-    if (options.showScale)
-      initScale($view, options)  
-    return -1;
-  },
-  changeMode: ($view: JQuery, options: ViewOptions): number => {
-    clearAll($view);
-    initMode($view, options);
-    const delta = calcDelta(options);
-    initThumb($view, options, delta);
-    if (options.showValue)
-      initLabel($view, options);
-    if (options.showScale)
-      initScale($view, options)    
-    return -1;
-  },
-  changeShowValue: ($view: JQuery, options: ViewOptions): number => {
-    initLabel($view, options);
-    return 0;
-  },
-  changeScale: ($view: JQuery, options: ViewOptions): number => {
-    initScale($view, options);
-    return 0;
-  }
 }
 
 // функции для создания и обновления вида настроек
@@ -609,20 +247,13 @@ function diversification(nodes: NodeListOf<HTMLInputElement>, id: string): NodeL
 
 function createElementsForValues(mode: Mode): HTMLInputElement[] {
   const array: HTMLInputElement[] = [];
-  if (mode === 'Single') {
+  const length = mode === 'Single' ? 1 : 2;
+  for (let index = 0; index < length; index++) {
     const inputWithValue: HTMLInputElement = createElement('input') as HTMLInputElement;
     inputWithValue.classList.add('values');
+    inputWithValue.dataset.order = `${index}`;
     inputWithValue.type = 'text';
-    array.push(inputWithValue);
-  } else {
-    const inputWithValueA: HTMLInputElement = createElement('input') as HTMLInputElement;
-    const inputWithValueB: HTMLInputElement = createElement('input') as HTMLInputElement;
-    inputWithValueA.classList.add('interval__a');
-    inputWithValueB.classList.add('interval__b');
-    inputWithValueA.type = 'text';
-    inputWithValueB.type = 'text';
-    array.push(inputWithValueA);
-    array.push(inputWithValueB);
+    array.push(inputWithValue);      
   }
   return array;
 }
@@ -635,13 +266,20 @@ function createElement(tag: string, className?: string | string[]): HTMLElement 
   return element;
 }
 
-export {
-  propsViewOptions, createElement, createSlider, calcSpace, calcDelta, stepToPixel,
-  stepBalancing, valueToPixel, changeLabelPosition, changeView,
-  createSettings, findElements, setElementsForValues, initValues, setNewData, setNodeValue, diversification
+export { 
+  createSettings, 
+  findElements, 
+  setElementsForValues, 
+  initValues, 
+  setNewData, 
+  setNodeValue, 
+  diversification
 };
 
 export {
+  createElement,
+  stepBalancing,
+  calcDelta,
   convValueNumberToPixel,
   convStepNumberToPixel
 }

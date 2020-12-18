@@ -22,13 +22,12 @@ class Presentor {
   constructor(public $object: JQuery, public options: ViewOptions) {
     this.emmiter = new EventEmmiter();    
     this.model = new Model(this.options, this.emmiter);
-
     this.initSettings();
     this.initView();
 
     this.subscribeOnSettingsEvents();
     this.subscribeOnViewEvents();
-    this.subscribeOnModalEvents();    
+    this.subscribeOnModelEvents();    
     this.subscribeOnCustomEvents();
   }
 
@@ -46,14 +45,24 @@ class Presentor {
     this.viewUnsubscribers.push(this.emmiter.subscribe('view:scale-clicked', this.model.handleScaleClicked));
   }
 
-  private subscribeOnModalEvents() {
+  private subscribeOnModelEvents() {
     if (this.view) {
-      this.viewUnsubscribers.push(this.emmiter.subscribe('modal:value-changed', this.view.handleValueChanged));
-      this.viewUnsubscribers.push(this.emmiter.subscribe('modal:setting-updated', this.view.handleViewChanged));
-      this.viewUnsubscribers.push(this.emmiter.subscribe('modal:mode-updated', this.view.handleModeChanged));
-      this.viewUnsubscribers.push(this.emmiter.subscribe('modal:type-updated', this.view.handleTypeChanged));
-      this.viewUnsubscribers.push(this.emmiter.subscribe('modal:range-updated', this.view.handleRangeChanged));     
-    }     
+      this.viewUnsubscribers.push(this.emmiter.subscribe('model:value-changed', this.view.handleValueChanged));
+      this.viewUnsubscribers.push(this.emmiter.subscribe('model:setting-updated', this.view.handleViewChanged));
+      this.viewUnsubscribers.push(this.emmiter.subscribe('model:mode-updated', this.view.handleModeChanged));
+      this.viewUnsubscribers.push(this.emmiter.subscribe('model:type-updated', this.view.handleTypeChanged));
+      this.viewUnsubscribers.push(this.emmiter.subscribe('model:range-updated', this.view.handleRangeChanged));
+      this.viewUnsubscribers.push(this.emmiter.subscribe('model:step-updated', this.view.handleStepChanged));    
+    } 
+    
+    if (!this.settings) {
+      this.settingsUnsubscribers.push(this.emmiter.subscribe('model:value-changed', this.settings.handleValueChanged));
+      this.settingsUnsubscribers.push(this.emmiter.subscribe('model:setting-updated', this.settings.handleTriggerChanged));
+      this.settingsUnsubscribers.push(this.emmiter.subscribe('model:mode-updated', this.settings.handleModeChanged));
+      this.settingsUnsubscribers.push(this.emmiter.subscribe('model:type-updated', this.settings.handleTypeChanged));
+      this.settingsUnsubscribers.push(this.emmiter.subscribe('model:range-updated', this.settings.handleRangeChanged));
+      this.settingsUnsubscribers.push(this.emmiter.subscribe('model:step-updated', this.settings.handleStepChanged));  
+    }
   }  
   
   private subscribeOnSettingsEvents() {
@@ -64,9 +73,9 @@ class Presentor {
       this.settingsUnsubscribers.push(this.emmiter.subscribe('setting:mode-changed', this.model.handleModeChanged));
       this.settingsUnsubscribers.push(this.emmiter.subscribe('setting:type-changed', this.model.handleTypeChanged));
       this.settingsUnsubscribers.push(this.emmiter.subscribe('setting:range-changed', this.model.handleRangeChanged));
+      this.settingsUnsubscribers.push(this.emmiter.subscribe('setting:step-changed', this.model.handleStepChanged));   
 
-      this.settingsUnsubscribers.push(this.emmiter.subscribe('setting:step-changed', this.model.handleStepChanged));      
-      this.settingsUnsubscribers.push(this.emmiter.subscribe('setting:value-changed', this.model.handleValueChanged));
+      this.settingsUnsubscribers.push(this.emmiter.subscribe('setting:value-changed', this.model.handleThumbMoved));
   }
 
   private subscribeOnCustomEvents() {
@@ -76,76 +85,6 @@ class Presentor {
 
   getModel(): Model {
     return this.model;
-  }
-
-  handleUpdateView = (data: ViewOptions, oldData: ViewOptions): void => {
-    this.view?.updateView(data, oldData);
-  }
-
-  handleChangeModelFromSettings = (event: Event): void => {
-    if (event.target) {
-      const target = event.target as HTMLInputElement | HTMLSelectElement;
-      let option: keyof ViewOptions | 'interval__a' | 'interval__b' | undefined;
-      let value: string | boolean | Mode | Orientation | undefined;
-      switch (target.className) {
-        case 'step':
-          option = 'step';
-          value = target.value;
-          break;
-        case 'mode__single':
-        case 'mode__multiple':
-          option = 'mode';
-          value = target.value;
-          break;
-        case 'view__horizontal':
-        case 'view__vertical':
-          option = 'orientation';
-          value = target.value;
-          break;
-        case 'info':
-          option = 'showValue';
-          if (target instanceof HTMLInputElement) {
-            value = target.checked;
-          }
-          break;
-        case 'scale-input':
-          option = 'showScale';
-          if (target instanceof HTMLInputElement) {
-            value = target.checked;
-          }
-          break;  
-        case 'values':
-          option = 'defaultValue';
-          value = target.value;
-          break;
-        case 'interval__a':
-          option = 'interval__a';
-          value = target.value;
-          break;
-        case 'interval__b':
-          option = 'interval__b';
-          value = target.value;
-          break;
-        case 'maximum':
-          option = 'maximumValue';
-          value = target.value;
-          break;
-        case 'minimum':
-          option = 'minimumValue';
-          value = target.value;
-          break;
-      }
-      this.model.updateData(option, value, 'settings'); //option: keyof ViewOptions, value: string | boolean | Mode | Orientation
-    }
-  }
-  handleUpdateSettingsView = (data: ViewOptions, prevData: ViewOptions): void => {
-    if (this.settings)
-      this.settings.updateSettingsView(data, prevData);
-
-    if (!data.showSettings) {
-      this.settings = undefined;
-      this.unsub.pop()?.unsubscribe();
-    }
   }
 
   destroy(): void {
