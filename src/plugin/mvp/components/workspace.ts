@@ -9,12 +9,7 @@ import {
 } from '../../utils/view.functions';
 
 
-interface IWorkspace {
-  computeSpace(minimum: number): this;
-  setStep(step: number): this;
-}
-
-class Workspace extends Component implements IWorkspace {
+class Workspace extends Component {
   element: HTMLDivElement;
   space: OwnSpace = {
     start: 0, // начальная точка пространства (px) 

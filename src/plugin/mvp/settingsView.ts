@@ -12,7 +12,6 @@ import {
 
 interface ISettingsView {
   element: HTMLDivElement;
-  //updateSettingsView(dataModel: ViewOptions, prevData: ViewOptions): void;
   handleSettingsViewChanged: (data: Options) => void;
 }
 
@@ -94,13 +93,7 @@ class SettingsView implements ISettingsView {
     this.element.addEventListener('change', this.changeSettingsHandler);
   }
 
-  // updateSettingsView(newDataModel: ViewOptions, prevData: ViewOptions): void {
-  //   console.log('settings update', newDataModel);
-  //   setNewData(newDataModel, prevData, this.view, this.$object, this.validator);
-  // }
-
-  // handlers
-
+  // model handler
   handleSettingsViewChanged: (data: Options) => void = (data: Options) => {
     const {
       showValueInput,

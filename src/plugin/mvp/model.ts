@@ -21,13 +21,6 @@ class Model implements IModel {
     this.options = { ...this.defaultOptions };
   }
 
-  // передаем 2 состояния параметров, сравниваем, обновляем те, которые не равны
-  // setData(content: Options): void {
-  //   console.log('update model', content);
-  //   const prevOptions = { ...this.options };
-  //   this.options = Object.assign({}, this.options, content);    
-  // }
-
   setData(content: Options): void {
     console.log('update model', content);
     //const prevOptions = { ...this.options };
