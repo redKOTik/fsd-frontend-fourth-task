@@ -31,7 +31,8 @@ $slider.sliderPlugin({
 // });
 
 $slider3.sliderPlugin({
-  minimumValue: '-20',
+  minimumValue: '40',
+  maximumValue: '60',
   step: '5',
   mode: 'Single',
   orientation: 'Horizontal',
@@ -56,7 +57,7 @@ $slider3.sliderPlugin({
 // }, 9000);
 
 // setTimeout(() => {
-//     $('#slider2').sliderPlugin('update', { showScale: false });
+//   $slider3.sliderPlugin('update', { showScale: false, showValue: false, defaultInterval: ['1', '99'] });
 // }, 10000);
 
 // setTimeout(() => {

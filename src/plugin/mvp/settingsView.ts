@@ -6,14 +6,14 @@ import {
   setElementsForValues,
   initValues,
   findElements,
-  setNewData,
   setNodeValue,
   diversification
 } from '../utils/view.functions';
 
 interface ISettingsView {
   element: HTMLDivElement;
-  updateSettingsView(dataModel: ViewOptions, prevData: ViewOptions): void;
+  //updateSettingsView(dataModel: ViewOptions, prevData: ViewOptions): void;
+  handleSettingsViewChanged: (data: Options) => void;
 }
 
 /**
@@ -94,9 +94,51 @@ class SettingsView implements ISettingsView {
     this.element.addEventListener('change', this.changeSettingsHandler);
   }
 
-  updateSettingsView(newDataModel: ViewOptions, prevData: ViewOptions): void {
-    console.log('settings update', newDataModel);
-    setNewData(newDataModel, prevData, this.view, this.$object, this.validator);
+  // updateSettingsView(newDataModel: ViewOptions, prevData: ViewOptions): void {
+  //   console.log('settings update', newDataModel);
+  //   setNewData(newDataModel, prevData, this.view, this.$object, this.validator);
+  // }
+
+  // handlers
+
+  handleSettingsViewChanged: (data: Options) => void = (data: Options) => {
+    const {
+      showValueInput,
+      showScaleInput,
+      orientationInputs,
+      modeInputs,
+      stepInput,
+      minInput,
+      maxInput,
+      divWithValue } = findElements(this.element);
+    switch (Object.keys(data)[0]) {
+      case 'showValue':
+        showValueInput.checked = data.showValue as boolean;
+        break;
+      case 'showScale':
+        showScaleInput.checked = data.showScale as boolean;
+        break;
+      case 'orientation':
+        setNodeValue(orientationInputs, data.orientation as Orientation);
+        break;
+      case 'mode':
+        setNodeValue(modeInputs, data.mode as Mode);
+        initValues(data.mode as Mode, setElementsForValues(divWithValue, data.mode as Mode), data.defaultValue as string, data.defaultInterval as [string, string]);
+        break;
+      case 'step':
+        stepInput.value = data.step as string;
+        break;
+      case 'minimumValue':
+        minInput.value = data.minimumValue as string;
+        break;
+      case 'maximumValue':
+        maxInput.value = data.maximumValue as string;
+        break;
+      case 'defaultValue':
+      case 'defaultInterval':
+        initValues(data.mode as Mode, setElementsForValues(divWithValue, data.mode as Mode), data.defaultValue as string, data.defaultInterval as [string, string]);
+        break;         
+    }
   }
 }
 

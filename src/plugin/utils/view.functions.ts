@@ -1,5 +1,3 @@
-import { Validator } from "./validator";
-
 function calcDelta(options: ViewOptions): number {
   return +options.maximumValue - +options.minimumValue;
 }
@@ -129,110 +127,12 @@ function setElementsForValues(div: HTMLDivElement, mode: Mode): HTMLInputElement
 }
 
 function initValues(mode: Mode, values: HTMLInputElement[] | NodeListOf<HTMLInputElement>, defaultValue: string, defaultInterval: [string, string]): void {
-  if (mode === 'Single') {
+  if (mode === 'Single') {    
     values[0].value = defaultValue;
   } else {
     values[0].value = defaultInterval[0];
     values[1].value = defaultInterval[1];
   }
-}
-
-function setNewData(data: ViewOptions, prevData: ViewOptions, view: HTMLDivElement, $object: JQuery, validator: Validator): void {
-  const {
-    showValueInput,
-    showScaleInput,
-    orientationInputs,
-    modeInputs,
-    stepInput,
-    minInput,
-    maxInput,
-    divWithValue } = findElements(view);
-  propsViewOptions.forEach((key) => {
-    if (checkKey(key, data, prevData)) {
-
-      let values: HTMLInputElement[] = [];
-      if (key === 'mode') {
-        values = setElementsForValues(divWithValue, data.mode);
-      }
-      const inputs: NodeListOf<HTMLInputElement> = divWithValue.querySelectorAll('input');
-
-      switch (key) {
-        case 'showValue':
-          showValueInput.checked = data.showValue;
-          return;
-        case 'showScale':
-          showScaleInput.checked = data.showScale;
-          return;  
-        case 'orientation':
-          setNodeValue(orientationInputs, data.orientation);
-          return;
-        case 'mode':
-          setNodeValue(modeInputs, data.mode);
-          initValues(data.mode, values, data.defaultValue, data.defaultInterval);
-          return;
-        case 'step':
-          stepInput.value = data.step;
-
-          if (!validator.errorHandler($object, stepInput, 'Обязательное поле', Validator.REQUIRED)) {
-            return;
-          }
-          if (!validator.errorHandler($object, stepInput, 'Поле должно быть целочисленным', Validator.ONLY_NUMBERS)) {
-            return;
-          }
-          validator.errorHandler($object, stepInput, 'Превышено максимальное количество символов', Validator.MAX_LENGTH, '3');
-          return;
-        case 'minimumValue':
-          minInput.value = data.minimumValue;
-
-          if (!validator.errorHandler($object, minInput, 'Обязательное поле', Validator.REQUIRED)) {
-            return;
-          }
-          if (!validator.errorHandler($object, minInput, 'Поле должно быть целочисленным', Validator.ONLY_NUMBERS)) {
-            return;
-          }
-          if (!validator.errorHandler($object, minInput, 'Значение должно быть не меньше -100', Validator.MIN_VALUE, '-100')) {
-            return;
-          }
-          validator.errorHandler($object, minInput, 'Интервал должен быть больше 0', Validator.CORRECT_INTERVAL, (+maxInput.value - +minInput.value).toString());
-          return;
-        case 'maximumValue':
-          maxInput.value = data.maximumValue;
-
-          if (!validator.errorHandler($object, maxInput, 'Обязательное поле', Validator.REQUIRED)) {
-            return;
-          }
-          if (!validator.errorHandler($object, maxInput, 'Поле должно быть целочисленным', Validator.ONLY_NUMBERS)) {
-            return;
-          }
-          if (!validator.errorHandler($object, maxInput, 'Значение должно быть не больше 100', Validator.MAX_VALUE, '100')) {
-            return;
-          }
-          validator.errorHandler($object, maxInput, 'Интервал должен быть больше 0', Validator.CORRECT_INTERVAL, (+maxInput.value - +minInput.value).toString());
-          return;
-        case 'defaultValue':
-        case 'defaultInterval':
-          initValues(data.mode, inputs, data.defaultValue, data.defaultInterval);
-
-          if (!validator.errorHandler($object, inputs, 'Обязательное поле', Validator.REQUIRED)) {
-            return;
-          }
-          if (!validator.errorHandler($object, inputs, 'Поле должно быть целочисленным', Validator.ONLY_NUMBERS)) {
-            return;
-          }
-          if (!validator.errorHandler($object, inputs, `Значение должно быть не больше ${maxInput.value}`, Validator.MAX_VALUE, maxInput.value)) {
-            return;
-          }
-          if (!validator.errorHandler($object, inputs, `Значение должно быть не меньше ${minInput.value}`, Validator.MIN_VALUE, minInput.value)) {
-            return;
-          }
-          inputs.length > 1 ? validator.errorHandler($object, inputs, 'Интервал должен быть больше 0', Validator.CORRECT_INTERVAL, (+inputs[1].value - +inputs[0].value).toString()) : true;
-          return;
-        case 'showSettings':
-          view.parentNode?.removeChild(view);
-          return;
-      }
-    }
-  })
 }
 
 function setNodeValue(nodes: NodeListOf<HTMLInputElement>, value: string): void {
@@ -270,8 +170,7 @@ export {
   createSettings, 
   findElements, 
   setElementsForValues, 
-  initValues, 
-  setNewData, 
+  initValues,   
   setNodeValue, 
   diversification
 };

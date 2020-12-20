@@ -13,7 +13,7 @@ class EventEmmiter {
     };
   }
 
-  dispatch(eventName: string, data: {[key: string]: any}): void {
+  dispatch(eventName: string, data: DispatchData): void {
     const observers: Observer[] = this.events[eventName];
 
     if (observers)

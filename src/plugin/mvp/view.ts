@@ -14,41 +14,15 @@ import ProgressBar from './components/progress-bar';
 import Scale from './components/scale';
 import Workspace from './components/workspace';
 
-
-type ChangedValue = {
-  [key: string]: string | string[]
-};
-
-type ChangedOption = {
-  [key: string]: boolean
-}
-
-type ChangedModeOption = {
-  [key: string]: Mode
-}
-
-type ChangedTypeOption = {
-  [key: string]: Orientation
-}
-
-type ChangedRangeOption = {
-  [key: string]: string
-}
-
-type ChangedStepOption = {
-  [key: string]: string
-}
-
-
 interface IView {
   $view: JQuery;
   component: Workspace;
-  handleValueChanged: (data: ChangedValue) => void;
-  handleViewChanged: (data: ChangedOption) => void;
-  handleModeChanged: (data: ChangedModeOption) => void;
-  handleTypeChanged: (data: ChangedTypeOption) => void;
-  handleRangeChanged: (data: ChangedRangeOption) => void;
-  handleStepChanged: (data: ChangedStepOption) => void;
+  handleValueChanged: (data: DispatchData) => void;
+  handleViewChanged: (data: DispatchData) => void;
+  handleModeChanged: (data: DispatchData) => void;
+  handleTypeChanged: (data: DispatchData) => void;
+  handleRangeChanged: (data: DispatchData) => void;
+  handleStepChanged: (data: DispatchData) => void;
 }
 
 /**
@@ -258,55 +232,61 @@ class View implements IView {
       .initLabel()
   }
 
-  handleValueChanged: (data: ChangedValue) => void = (data: ChangedValue) => {
-    switch (Object.keys(data)[0]) {
-      case 'defaultValue':
-        this.options.defaultValue = data['defaultValue'] as string;
-        this.updateThumb(this.component.thumbs[0], this.options.defaultValue);
-        break;
-      case 'defaultInterval':
-        this.options.defaultInterval = data['defaultInterval'] as [string, string];
-        this.component.thumbs.forEach((thumb, index) => {
-          this.updateThumb(thumb, this.options.defaultInterval[index]);
-        });          
-        break;
-    }
+  // model handlers
+
+  handleValueChanged: (data: DispatchData) => void = (data: DispatchData) => {
+    Object.keys(data).forEach(key => {
+      switch (key) {
+        case 'defaultValue':
+          this.options.defaultValue = data['defaultValue'] as string;
+          if (this.options.mode === 'Single')
+            this.updateThumb(this.component.thumbs[0], this.options.defaultValue);
+          break;
+        case 'defaultInterval':
+          this.options.defaultInterval = data['defaultInterval'] as [string, string];
+          if (this.options.mode === 'Multiple')
+            this.component.thumbs.forEach((thumb, index) => {
+              this.updateThumb(thumb, this.options.defaultInterval[index]);
+            });          
+          break;
+      }
+    });    
     this.initProgressBarElement();
   }
 
-  handleViewChanged: (data: ChangedOption) => void = (data: ChangedOption) => {
+  handleViewChanged: (data: DispatchData) => void = (data: DispatchData) => {
     switch (Object.keys(data)[0]) {
       case 'showValue':
-        this.options.showValue = data.showValue;
+        this.options.showValue = data.showValue as boolean;
         this.toggleShowValueSetting();
         return;
       case 'showScale':
-        this.options.showScale = data.showScale;
+        this.options.showScale = data.showScale as boolean;
         this.toggleShowScaleSetting();
         return;
     }
   }
 
-  handleModeChanged: (data: ChangedModeOption) => void = (data: ChangedModeOption) => {
-    this.options.mode = data.mode;
+  handleModeChanged: (data: DispatchData) => void = (data: DispatchData) => {
+    this.options.mode = data.mode as Mode;
     this.toggleSetting();
   }
 
-  handleTypeChanged: (data: ChangedTypeOption) => void = (data: ChangedTypeOption) => {
-    this.options.orientation = data.view;
+  handleTypeChanged: (data: DispatchData) => void = (data: DispatchData) => {
+    this.options.orientation = data.view as Orientation;
     this.toggleSetting();
   }
 
-  handleRangeChanged: (data: ChangedRangeOption) => void = (data: ChangedRangeOption) => {
+  handleRangeChanged: (data: DispatchData) => void = (data: DispatchData) => {
     data.minimumValue 
-      ? this.options.minimumValue = data.minimumValue 
-      : this.options.maximumValue = data.maximumValue;
+      ? this.options.minimumValue = data.minimumValue as string 
+      : this.options.maximumValue = data.maximumValue as string;
     this.initWorkspace(this.options);
     this.changeViewFromRange();
   }
 
-  handleStepChanged: (data: ChangedStepOption) => void = (data: ChangedRangeOption) => {
-    this.options.step = data.step;
+  handleStepChanged: (data: DispatchData) => void = (data: DispatchData) => {
+    this.options.step = data.step as string;
     this.component.setStep(
       convStepNumberToPixel(
         +this.options.step,

@@ -52,16 +52,16 @@ class Presentor {
       this.viewUnsubscribers.push(this.emmiter.subscribe('model:mode-updated', this.view.handleModeChanged));
       this.viewUnsubscribers.push(this.emmiter.subscribe('model:type-updated', this.view.handleTypeChanged));
       this.viewUnsubscribers.push(this.emmiter.subscribe('model:range-updated', this.view.handleRangeChanged));
-      this.viewUnsubscribers.push(this.emmiter.subscribe('model:step-updated', this.view.handleStepChanged));    
+      this.viewUnsubscribers.push(this.emmiter.subscribe('model:step-updated', this.view.handleStepChanged));
     } 
     
-    if (!this.settings) {
-      this.settingsUnsubscribers.push(this.emmiter.subscribe('model:value-changed', this.settings.handleValueChanged));
-      this.settingsUnsubscribers.push(this.emmiter.subscribe('model:setting-updated', this.settings.handleTriggerChanged));
-      this.settingsUnsubscribers.push(this.emmiter.subscribe('model:mode-updated', this.settings.handleModeChanged));
-      this.settingsUnsubscribers.push(this.emmiter.subscribe('model:type-updated', this.settings.handleTypeChanged));
-      this.settingsUnsubscribers.push(this.emmiter.subscribe('model:range-updated', this.settings.handleRangeChanged));
-      this.settingsUnsubscribers.push(this.emmiter.subscribe('model:step-updated', this.settings.handleStepChanged));  
+    if (this.settings) {
+      this.settingsUnsubscribers.push(this.emmiter.subscribe('model:value-changed', this.settings.handleSettingsViewChanged));
+      this.settingsUnsubscribers.push(this.emmiter.subscribe('model:setting-updated', this.settings.handleSettingsViewChanged));
+      this.settingsUnsubscribers.push(this.emmiter.subscribe('model:mode-updated', this.settings.handleSettingsViewChanged));
+      this.settingsUnsubscribers.push(this.emmiter.subscribe('model:type-updated', this.settings.handleSettingsViewChanged));
+      this.settingsUnsubscribers.push(this.emmiter.subscribe('model:range-updated', this.settings.handleSettingsViewChanged));
+      this.settingsUnsubscribers.push(this.emmiter.subscribe('model:step-updated', this.settings.handleSettingsViewChanged));  
     }
   }  
   

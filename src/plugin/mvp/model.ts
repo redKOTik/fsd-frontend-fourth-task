@@ -1,14 +1,9 @@
 import EventEmmiter from "../utils/emmiter";
 
 interface IModel {
-  readonly defaultValues: ViewOptions
+  readonly defaultOptions: ViewOptions
   options: ViewOptions
-
-  updateData(option: keyof ViewOptions | 'interval__a' | 'interval__b' | undefined,
-    value: string | boolean | Mode | Orientation | undefined, source: string): void
 }
-
-type modelObserver = (data: ViewOptions, prevData: ViewOptions) => void;
 
 /**
  * @class Model
@@ -18,60 +13,81 @@ type modelObserver = (data: ViewOptions, prevData: ViewOptions) => void;
  * @param options
  */
 class Model implements IModel {
-  defaultValues: ViewOptions;
+  defaultOptions: ViewOptions;
   options: ViewOptions;
 
   constructor(options: ViewOptions, public emmiter: EventEmmiter) {
-    this.defaultValues = options;
-    this.options = { ...this.defaultValues };
+    this.defaultOptions = options;
+    this.options = { ...this.defaultOptions };
   }
+
+  // передаем 2 состояния параметров, сравниваем, обновляем те, которые не равны
+  // setData(content: Options): void {
+  //   console.log('update model', content);
+  //   const prevOptions = { ...this.options };
+  //   this.options = Object.assign({}, this.options, content);    
+  // }
 
   setData(content: Options): void {
     console.log('update model', content);
-    const prevOptions = { ...this.options };
-    this.options = Object.assign({}, this.options, content);    
+    //const prevOptions = { ...this.options };
+    this.options = Object.assign({}, this.options, content);
+    this.defineEventType(content);    
   }
 
-  getModelData(): Pick<Model, 'defaultValues' | 'options'> {
-    const { defaultValues, options } = { ...this };
+  getModelData(): Pick<Model, 'defaultOptions' | 'options'> {
+    const { defaultOptions, options } = { ...this };
     return {
-      defaultValues,
+      defaultOptions,
       options
     }
   }
 
   getDefaultValues(): ViewOptions {
     return {
-      ...this.defaultValues
+      ...this.defaultOptions
     }
-  }
+  }  
 
-  updateData(option: keyof ViewOptions | 'interval__a' | 'interval__b' | undefined,
-    value: string | boolean | Mode | Orientation | undefined, source: string): void {
-    if (option === undefined || value === undefined) {
-      try {
-        throw new Error('bad argument');
-      } catch (e) {
-        console.log('error', e);
+  defineEventType(content: Options): void {
+    Object.keys(content).forEach(key => {      
+      switch(key) {
+        case 'showValue':
+          this.emmiter.dispatch('model:setting-updated', {'showValue': content.showValue as boolean});
+          break;
+        case 'showScale':
+          this.emmiter.dispatch('model:setting-updated', {'showScale': content.showScale as boolean});
+          break;
+        case 'mode':
+          this.emmiter.dispatch('model:mode-updated', {
+            'mode': content.mode as Mode, 
+            'defaultValue': this.options.defaultValue, 
+            'defaultInterval': this.options.defaultInterval
+          });
+          break;
+        case 'orientation':
+          this.emmiter.dispatch('model:type-updated', {'orientation': content.orientation as Orientation});
+          break;
+        case 'minimumValue':
+        case 'maximumValue':
+          this.emmiter.dispatch('model:range-updated', { [key]: content[key] as string});
+          break;
+        case 'defaultValue':
+        case 'defaultInterval':
+          this.emmiter.dispatch('model:value-changed', {
+            'mode': this.options.mode, 
+            'defaultValue': this.options.defaultValue, 
+            'defaultInterval': this.options.defaultInterval
+          });  
+          break;
+        case 'step':
+          this.emmiter.dispatch('model:step-updated', { step: content.step as string});
+          break;
       }
-    } else if (option === 'interval__a' && typeof value === 'string') {
-      this.setData({
-        'defaultInterval': [value, this.options.defaultInterval[1]]
-      });
-    } else if (option === 'interval__b' && typeof value === 'string') {
-      this.setData({
-        'defaultInterval': [this.options.defaultInterval[0], value]
-      });
-    } else {
-      this.setData({
-        [option]: value
-      });
-    }
-
-    console.log(`update model through ${source}`, this.options);
+    })
   }
 
-  /////////////////////////////////////////////
+  // methods
 
   updateInfoFromSettings(value: boolean): void {
     this.options.showValue = value;
@@ -85,7 +101,11 @@ class Model implements IModel {
 
   updateModeFromSettings(value: Mode): void {
     this.options.mode = value;
-    this.emmiter.dispatch('model:mode-updated', {'mode': this.options.mode});
+    this.emmiter.dispatch('model:mode-updated', {
+      'mode': this.options.mode, 
+      'defaultValue': this.options.defaultValue, 
+      'defaultInterval': this.options.defaultInterval
+    });
   }
 
   updateTypeFromSettings(value: Orientation): void {
@@ -109,20 +129,20 @@ class Model implements IModel {
         throw new Error('no change required');
       }
       this.options.defaultInterval[this.defineIndexMutableValue(value)] = value;
-      this.emmiter.dispatch('model:value-changed', {'defaultInterval': this.options.defaultInterval});
+      this.emmiter.dispatch('model:value-changed', {'defaultInterval': this.options.defaultInterval, 'mode': this.options.mode});
     } else {
       this.options.defaultValue = value;
-      this.emmiter.dispatch('model:value-changed', {'defaultValue': this.options.defaultValue});  
+      this.emmiter.dispatch('model:value-changed', {'defaultValue': this.options.defaultValue, 'mode': this.options.mode});  
     }
   }
 
   updateValueFromThumb(value: string, index: number): void {
     if (this.options.mode === 'Multiple') {      
       this.options.defaultInterval[index] = value;
-      this.emmiter.dispatch('model:value-changed', {'defaultInterval': this.options.defaultInterval});
+      this.emmiter.dispatch('model:value-changed', {'defaultInterval': this.options.defaultInterval, 'mode': this.options.mode});
     } else {
       this.options.defaultValue = value;
-      this.emmiter.dispatch('model:value-changed', {'defaultValue': this.options.defaultValue});  
+      this.emmiter.dispatch('model:value-changed', {'defaultValue': this.options.defaultValue, 'mode': this.options.mode});  
     }
   }
 
@@ -137,39 +157,41 @@ class Model implements IModel {
 
   // view handlers
 
-  handleThumbMoved: (data: {[key: string]: any}) => void = (data: {[key: string]: any}) => {
-    const value = data.value ? data.value as string : this.defineValueFromPixel(data.position, data.step);
+  handleThumbMoved: (data: DispatchData) => void = (data: DispatchData) => {
+    const value = data.value 
+      ? data.value as string 
+      : this.defineValueFromPixel(data.position as number, data.step as number);
     this.updateValueFromThumb(value, +data.index);
   }
 
-  handleScaleClicked: (data: {[key: string]: any}) => void = (data: {[key: string]: any}) => {
-    this.updateValueFromScale(data.value);
+  handleScaleClicked: (data: DispatchData) => void = (data: DispatchData) => {
+    this.updateValueFromScale(data.value as string);
   }
  
   // settings handlers
 
-  handleInfoChanged: (data: {[key: string]: any}) => void = (data: {[key: string]: any}) => {
-    this.updateInfoFromSettings(data.showValue);
+  handleInfoChanged: (data: DispatchData) => void = (data: DispatchData) => {
+    this.updateInfoFromSettings(data.showValue as boolean);
   }
 
-  handleScaleChanged: (data: {[key: string]: any}) => void = (data: {[key: string]: any}) => {
-    this.updateScaleFromSettings(data.showScale);
+  handleScaleChanged: (data: DispatchData) => void = (data: DispatchData) => {
+    this.updateScaleFromSettings(data.showScale as boolean);
   }
 
-  handleModeChanged: (data: {[key: string]: any}) => void = (data: {[key: string]: any}) => {
-    this.updateModeFromSettings(data.mode);
+  handleModeChanged: (data: DispatchData) => void = (data: DispatchData) => {
+    this.updateModeFromSettings(data.mode as Mode);
   }
 
-  handleTypeChanged: (data: {[key: string]: any}) => void = (data: {[key: string]: any}) => {
-    this.updateTypeFromSettings(data.view);
+  handleTypeChanged: (data: DispatchData) => void = (data: DispatchData) => {
+    this.updateTypeFromSettings(data.view as Orientation);
   }
 
-  handleRangeChanged: (data: {[key: string]: any}) => void = (data: {[key: string]: any}) => {
-    this.updateRangeFromSettings(data.value, data.tag);
+  handleRangeChanged: (data: DispatchData) => void = (data: DispatchData) => {
+    this.updateRangeFromSettings(data.value as string, data.tag as 'minimumValue' | 'maximumValue');
   }
 
-  handleStepChanged: (data: {[key: string]: any}) => void = (data: {[key: string]: any}) => {
-    this.updateStepFromSettings(data.step);
+  handleStepChanged: (data: DispatchData) => void = (data: DispatchData) => {
+    this.updateStepFromSettings(data.step as string);
   }
 }
 

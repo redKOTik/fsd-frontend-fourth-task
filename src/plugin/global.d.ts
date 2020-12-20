@@ -15,7 +15,13 @@ type MouseHandler = (event: MouseEvent) => void;
 type Unsubables = {
   unsubscribe: () => void 
 };
-type Observer = (data: {[key: string]: any}) => void;
+
+type DispatchData = {
+  [key: string]: string | number | Mode | Orientation | boolean | [string, string]
+};
+
+type Observer = (data: DispatchData) => void;
 type Emmiter = {
   [key: string]: Observer []
-}
+};
+
