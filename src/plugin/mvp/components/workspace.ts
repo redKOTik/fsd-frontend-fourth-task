@@ -69,13 +69,11 @@ class Workspace extends Component {
   }    
 
   computeNewOffsetPosition(now: number, options: HandleOptions): number {
-    let newOffsetPosition;
-    if (now < options.ownSpace.start) {
+    let newOffsetPosition = stepBalancing(now, this.step, options.ownSpace.start);
+    if (newOffsetPosition < options.ownSpace.start || now < options.ownSpace.start) {
       newOffsetPosition = options.ownSpace.start;
-    } else if (now > options.ownSpace.end) {
+    } else if (newOffsetPosition > options.ownSpace.end || now > options.ownSpace.end) {
       newOffsetPosition = options.ownSpace.end;
-    } else {
-      newOffsetPosition = stepBalancing(now, this.step);
     }
     return newOffsetPosition;
   }

@@ -2,8 +2,8 @@ function calcDelta(options: ViewOptions): number {
   return +options.maximumValue - +options.minimumValue;
 }
 
-function stepBalancing(change: number, step: number): number {
-  const balance = change % step;
+function stepBalancing(change: number, step: number, start: number): number {
+  const balance = (change - start) % step;
   if (step / 2 <= balance) {
     return change + (step - balance);
   } else {
