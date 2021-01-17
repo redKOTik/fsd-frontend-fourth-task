@@ -69,12 +69,10 @@ class Presentor {
     if (this.options.showSettings && this.settings)
       this.settingsUnsubscribers.push(this.emmiter.subscribe('setting:info-changed', this.model.handleInfoChanged));
       this.settingsUnsubscribers.push(this.emmiter.subscribe('setting:scale-changed', this.model.handleScaleChanged));
-
       this.settingsUnsubscribers.push(this.emmiter.subscribe('setting:mode-changed', this.model.handleModeChanged));
       this.settingsUnsubscribers.push(this.emmiter.subscribe('setting:type-changed', this.model.handleTypeChanged));
       this.settingsUnsubscribers.push(this.emmiter.subscribe('setting:range-changed', this.model.handleRangeChanged));
-      this.settingsUnsubscribers.push(this.emmiter.subscribe('setting:step-changed', this.model.handleStepChanged));   
-
+      this.settingsUnsubscribers.push(this.emmiter.subscribe('setting:step-changed', this.model.handleStepChanged));
       this.settingsUnsubscribers.push(this.emmiter.subscribe('setting:value-changed', this.model.handleThumbMoved));
   }
 
