@@ -13,6 +13,7 @@ import {
 interface ISettingsView {
   element: HTMLDivElement;
   handleSettingsViewChanged: (data: Options) => void;
+  changeSettingsHandler: (event: Event) => void;
 }
 
 /**
@@ -51,7 +52,7 @@ class SettingsView implements ISettingsView {
     const siblings: HTMLDivElement = view.nextSibling as HTMLDivElement;
 
     showValueInput.checked = data.showValue;
-    showScaleInput.checked = data.showScale;
+    showScaleInput.checked = data.showScale;   
     setNodeValue(diversification(orientationInputs, siblings.id), data.orientation);
     setNodeValue(diversification(modeInputs, siblings.id), data.mode);
     stepInput.value = data.step;
@@ -61,7 +62,7 @@ class SettingsView implements ISettingsView {
   }
 
   // handler
-  changeSettingsHandler: (event: Event) => void = (event: Event) => {
+  changeSettingsHandler(event: Event): void {
     const target: HTMLInputElement = event.target as HTMLInputElement;
     switch (target.className) {
       case 'info':
@@ -83,14 +84,16 @@ class SettingsView implements ISettingsView {
         this.emmiter.dispatch('setting:step-changed', { step: target.value });
         return;
       case 'values':
-        this.emmiter.dispatch('setting:value-changed', { value: target.value, index: target.dataset.order });
+        if (target.dataset.order) {
+          this.emmiter.dispatch('setting:value-changed', { value: target.value, index: target.dataset.order });
+        }        
         return;      
     }
   }
 
   // set listener
   onChangeSettings(): void {
-    this.element.addEventListener('change', this.changeSettingsHandler);
+    this.element.addEventListener('change', this.changeSettingsHandler.bind(this));
   }
 
   // model handler

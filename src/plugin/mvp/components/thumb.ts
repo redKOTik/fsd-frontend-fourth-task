@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import Component from './component';
 
 import {
@@ -40,8 +41,9 @@ class Thumb extends Component {
       .initLabel()
       .renderLabel();
      return this;
-    }      
-    this.label.destroy(); 
+    } else if (this.element.parentNode?.querySelector('.label')) {
+      this.label.destroy(); 
+    }
     return this;
   }
 

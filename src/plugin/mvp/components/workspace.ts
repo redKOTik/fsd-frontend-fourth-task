@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import Component from './component';
 import Thumb from './thumb';
 import Scale from './scale';
@@ -63,8 +64,9 @@ class Workspace extends Component {
   renderScaleOnWorkspace(isShowScale: boolean): this {
     if (isShowScale)
       this.element.insertAdjacentElement('beforeend', this.scale.element);
-    else 
+    else if (this.element.querySelector('.scale')) {
       this.scale.destroy();  
+    }      
     return this;
   }    
 

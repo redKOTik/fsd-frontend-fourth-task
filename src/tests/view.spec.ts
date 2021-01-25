@@ -1,10 +1,12 @@
 import $ from 'jquery';
-
 import { View } from '../plugin/mvp/view';
+import EventEmmiter from '../plugin/utils/emmiter';
 
-describe('Тестирование Вида: ', () => {
+describe('Тестирование вида слайдера: ', () => {
     let options: ViewOptions;
     let view: View;
+    let wrapper: HTMLDivElement;
+    let emmiter: EventEmmiter;
 
     beforeEach(() => {
         options = {
@@ -22,23 +24,29 @@ describe('Тестирование Вида: ', () => {
           showScale: false
         };
 
-        const wrapper: HTMLDivElement = document.createElement('div') as HTMLDivElement;
-        view = new View($(wrapper), options);
+        emmiter = new EventEmmiter();
+        wrapper = document.createElement('div') as HTMLDivElement;
+        wrapper.id = 'slider';
+        document.body.insertAdjacentElement('afterbegin', wrapper);
+        view = new View($(wrapper), options, emmiter);
     });
 
-    test('вид должен существовать и быть типом function', () => {
-      expect(View).toBeDefined();
-      expect(typeof View).toBe('function');
+    test('вид должен существовать и быть объектом', () => {
+      expect(view).toBeDefined();
+      expect(typeof view).toBe('object');
     });
 
-    test('экземпляр вида должен содержать метод обновления вида: updateView, свойства:', () => {
-      expect(view.updateView).toBeDefined();
+    test('экземпляр вида должен содержать методы обновления вида:', () => {
+      expect(view.handleValueChanged).toBeDefined();
+      expect(view.handleViewChanged).toBeDefined();
+      expect(view.handleModeChanged).toBeDefined();
+      expect(view.handleTypeChanged).toBeDefined();
+      expect(view.handleRangeChanged).toBeDefined();
+      expect(view.handleStepChanged).toBeDefined();
     });
 
     test('вид должен иметь элемент с классом slider:', () => {
-      const slider = view.$view.find('.slider');      
+      const slider = view?.$view.find('.slider');
       expect(slider).toBeDefined();
     });
-
-
 });

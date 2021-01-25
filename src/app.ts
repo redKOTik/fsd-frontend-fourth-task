@@ -43,8 +43,6 @@ $slider3.sliderPlugin({
   }
 });
 
-
-
 // setTimeout(() => {
 //     $('#slider').sliderPlugin('update', {
 //         defaultValue: '40',

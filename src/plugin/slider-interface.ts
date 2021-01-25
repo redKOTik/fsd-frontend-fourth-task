@@ -6,7 +6,7 @@ type Single = 'Single' & string;
 type Multiple = 'Multiple' & string;
 type Mode = Single | Multiple;
 
-type ValueChanged = (event: CustomEvent, value: string) => void;
+type ValueChanged = (event: JQuery.Event, value: string) => void;
 
 type Options = {
   readonly showSettings?: boolean,

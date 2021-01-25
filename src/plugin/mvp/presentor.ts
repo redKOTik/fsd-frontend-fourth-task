@@ -33,7 +33,7 @@ class Presentor {
 
   private initSettings() {
     if (this.options.showSettings)
-      this.settings = new SettingsView(this.$object, this.model.getDefaultValues(), this.emmiter);    
+      this.settings = new SettingsView(this.$object, this.model.getDefaultValues(), this.emmiter);  
   }
 
   private initView() {
@@ -78,7 +78,7 @@ class Presentor {
 
   private subscribeOnCustomEvents() {
     if (typeof (this.options.onValueChanged) === 'function' && this.view)
-      this.view.$view.on('valueChanged', this.options.onValueChanged);
+      this.view.$view.on('value-change', this.options.onValueChanged);
   }  
 
   getModel(): Model {
@@ -89,7 +89,7 @@ class Presentor {
     this.view?.$view.removeClass().parent().html('');
     this.viewUnsubscribers.forEach(unsubscriber => unsubscriber.unsubscribe());
     this.settingsUnsubscribers.forEach(unsubscriber => unsubscriber.unsubscribe());
-    this.view?.$view.off('valueChanged');
+    this.view?.$view.off('value-change');
   }
 }
 

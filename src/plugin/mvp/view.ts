@@ -152,8 +152,11 @@ class View implements IView {
 
   clickToScaleHandler: (event: Event) => void = (event: Event) => {
     const target: HTMLElement = event.target as HTMLElement;
-    if (target && target.classList.contains('mark-content'))
-      this.emmitter.dispatch('view:scale-clicked', { value: target.textContent })
+    if (target && target.classList.contains('mark-content')) {
+      if (target.textContent) {
+        this.emmitter.dispatch('view:scale-clicked', { value: target.textContent });
+      }      
+    }      
   }
 
   mousemoveHandler: HandleEvent = (options: HandleOptions, event: MouseEvent) => {
