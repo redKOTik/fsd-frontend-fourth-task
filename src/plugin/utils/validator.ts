@@ -1,129 +1,103 @@
+type validator = (value: string) => boolean;
+type limitValidator = (limit: number) => validator;
+
+type validatorFns = {
+  required?: validator,
+  max?: validator,
+  min?: validator
+}
+
+type Field = {
+  tag: string,
+  validators: string[],
+  validatorFns?: validatorFns
+}
+
+type Instructions = Field[];
+
 /**
  * @class Validator
  *
  * Валидация полей с настройками
  */
 class Validator {
-  static REQUIRED = 'REQUIRED';
-  static MAX_LENGTH = 'MAX_LENGTH';
-  static MAX_VALUE = 'MAX_VALUE';
-  static MIN_VALUE = 'MIN_VALUE';
-  static ONLY_NUMBERS = 'ONLY_NUMBERS';
-  static CORRECT_INTERVAL = 'CORRECT_INTERVAL';
+  
+  static required: validator = val => !!val;
+  static max: limitValidator = maxNum => (val: string): boolean => +val <= maxNum;
+  static min: limitValidator = minNum => (val: string): boolean => +val >= minNum;
 
   wrapper: HTMLDivElement | null = null;
 
-  public validate(element: HTMLInputElement, flag: string, validatorValue?: string): boolean {
-
-    const value = validatorValue ? +validatorValue : -1;
-
-    const isLengthValid = element.value.trim().length <= value;
-    const isRequired = element.value.trim().length > 0;
-    const isMaxValid = +element.value.trim() <= value;
-    const isMinValid = +element.value.trim() >= value;
-    const isCorrect = value > 0
-
-    switch (flag) {
-      case Validator.MAX_LENGTH:
-        return isLengthValid;
-      case Validator.REQUIRED:
-
-        return isRequired;
-      case Validator.MAX_VALUE:
-
-        return isMaxValid;
-      case Validator.MIN_VALUE:
-
-        return isMinValid;
-      case Validator.ONLY_NUMBERS:
-        return this.checkFields(element);
-      case Validator.CORRECT_INTERVAL:
-        return isCorrect;
-      default:
-        return false;
-    }
+  constructor(public instructions: Instructions) {
+    this.setFunctions(instructions);
   }
 
-  public errorHandler($object: JQuery, field: HTMLInputElement | NodeListOf<HTMLInputElement>, message: string, type: string, value?: string): boolean {
-    let isValid = true;
-    const fieldsValid: Array<boolean> = [];
+  setFunctions(instructions: Instructions): void {
+    instructions.forEach(field => {
 
-    if (field instanceof HTMLInputElement) {
-      isValid = this.validate(field, type, value);
-    } else {
-      field.forEach((element) => {
-        const valid = this.validate(element, type, value);
-        if (!valid) {
-          isValid = false;
+      if (field.validators.length > 0) {
+        field.validatorFns = {} as validatorFns;
+      }
+
+      field.validators.forEach(validator => {
+        if (validator === 'required') {
+          if (field.validatorFns) {
+            field.validatorFns.required = Validator.required;
+          }
         }
-        fieldsValid.push(valid);
+
+        if (validator === 'max') {
+          if (field.validatorFns) {
+            field.validatorFns.max = Validator.max(2000);
+          }
+        }
+
+        if (validator === 'min') {
+          if (field.validatorFns) {
+            field.validatorFns.min = Validator.min(-1000);
+          }
+        }
+      });
+    });
+  }
+
+  public validate(tag: string, element: HTMLInputElement): boolean {
+    let accIsValid = true;
+    const validators = this.instructions.find(field => field.tag === tag)?.validatorFns;
+    
+    if (validators) {
+      const keys = Object.keys(validators) as Array<keyof validatorFns>;
+      keys.forEach((key) => {
+        const fn = validators[key];
+        if (fn) {          
+          if (!fn(element.value)) {
+            accIsValid = false;
+            this.errorHandler(element, key);
+          }
+        }
       });
     }
 
-
-
-    if (!isValid) {
-      if (type === Validator.REQUIRED) {
-        $object.addClass('slider_disabled');
-        if (field instanceof HTMLInputElement) {
-          field.setAttribute('placeholder', message);
-          field.dataset.valid = 'false';
-        } else {
-          fieldsValid.forEach((value, index) => {
-            if (!value) {
-              field[index].setAttribute('placeholder', message);
-              field[index].dataset.valid = 'false';
-            }
-          });
-        }
-
-      } else if ([Validator.MAX_VALUE, Validator.MIN_VALUE, Validator.MAX_LENGTH, Validator.ONLY_NUMBERS, Validator.CORRECT_INTERVAL].includes(type)) {
-        $object.addClass('slider_disabled');
-        if (field instanceof HTMLInputElement) {
-          this.showMessageTemporally($object, field, message, type, 4500);
-        } else {
-          fieldsValid.forEach((value, index) => {
-            if (!value) {
-              this.showMessageTemporally($object, field[index], message, type, 4500);
-            }
-          });
-        }
-      }
-    } else {
-      if (field instanceof HTMLInputElement) {
-        field.dataset.valid = 'true';
-      } else {
-        fieldsValid.forEach((_, index) => {
-          field[index].dataset.valid = 'true';
-        });
-      }
-
-      if (type === Validator.CORRECT_INTERVAL && field instanceof HTMLInputElement) {
-        field.parentNode?.childNodes.forEach((e: ChildNode) => {
-          if (e instanceof HTMLInputElement) {
-            e.dataset.valid = 'true';
-          }
-        });
-      }
-    }
-    if ($object.parent().find('[data-valid="false"]').length === 0) {
-      $object.removeClass('slider_disabled');
-    }
-
-    return isValid;
+    return accIsValid;    
   }
 
-  public showMessageTemporally($object: JQuery, field: HTMLInputElement, message: string, dataType: string, hideTime: number): void {
-    this.showMessage($object, field, message, dataType);
-    setTimeout(this.hideMessage.bind(this, $object, field, dataType), hideTime);
+  public errorHandler(field: HTMLInputElement, key: string): void {
+    if (key === 'min') {
+      this.showMessageTemporally(field, `значение ${field.value} выходит за установленные границы`, 'range', 4000);
+    }
   }
 
-  public hideMessage($object: JQuery, field: HTMLInputElement, dataType: string): void {
+  public showMessageTemporally(field: HTMLInputElement, message: string, dataType: string, hideTime: number): void {
+    this.showMessage(field, message, dataType);
+    setTimeout(this.hideMessage.bind(this, field, dataType), hideTime);
+  }
+
+  public hideMessage(field: HTMLInputElement, dataType: string): void {
     if (this.wrapper?.querySelectorAll('[data-show="true"]').length === 1) {
       this.wrapper.remove();
       this.wrapper = null;
     } else {
-      const span: HTMLSpanElement = $object[0].parentNode?.querySelector(`.${'default' || field.className}-${dataType.toLowerCase()}`) as HTMLSpanElement;
+      const span: HTMLSpanElement = field.parentNode?.querySelector(`.${'default' || field.className}-${dataType.toLowerCase()}`) as HTMLSpanElement;
       if (span) {
         span.dataset.show = 'false';
         setTimeout(() => {
@@ -133,13 +107,13 @@ class Validator {
     }
   }
 
-  public showMessage($object: JQuery, field: HTMLInputElement, message: string, dataType: string): void {
+  public showMessage(field: HTMLInputElement, message: string, dataType: string): void {
     console.log(this.wrapper);
     if (this.wrapper === null) {
       this.wrapper = this.createContainer();
     }
 
-    $object[0].insertAdjacentElement('afterend', this.wrapper);
+    document.body.insertAdjacentElement('beforeend', this.wrapper);
 
     const span = document.createElement('span');
     span.textContent = message;

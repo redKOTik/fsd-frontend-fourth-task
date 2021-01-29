@@ -28,7 +28,11 @@ class SettingsView implements ISettingsView {
   validator: Validator;
   constructor(public $object: JQuery, dataModel: ViewOptions, public emmiter: EventEmmiter) {
     this.element = createSettings();
-    this.validator = new Validator();
+    this.validator = new Validator([
+      { tag: 'range',  validators: ['required', 'min', 'max'] },
+      { tag: 'step',  validators: ['required', 'min', 'max'] },
+      { tag: 'values',  validators: ['required', 'min', 'max'] }
+    ]);
     this.render($object, this.element);
     this.init(dataModel, this.element);
     this.onChangeSettings();
@@ -78,16 +82,19 @@ class SettingsView implements ISettingsView {
         this.emmiter.dispatch('setting:type-changed', { view: target.value });
         return; 
       case'range':
-        this.emmiter.dispatch('setting:range-changed', {value: target.value, tag: `${target.name}Value` });
+        if (this.validator.validate('range', target))
+          this.emmiter.dispatch('setting:range-changed', {value: target.value, tag: `${target.name}Value` });
         return;
       case 'step':
-        this.emmiter.dispatch('setting:step-changed', { step: target.value });
+        if (this.validator.validate('step', target))
+          this.emmiter.dispatch('setting:step-changed', { step: target.value });
         return;
       case 'values':
         if (target.dataset.order) {
-          this.emmiter.dispatch('setting:value-changed', { value: target.value, index: target.dataset.order });
+          if (this.validator.validate('values', target))
+            this.emmiter.dispatch('setting:value-changed', { value: target.value, index: target.dataset.order });
         }        
-        return;      
+        return;
     }
   }
 
