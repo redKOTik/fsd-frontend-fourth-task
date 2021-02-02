@@ -27,15 +27,16 @@ class SettingsView implements ISettingsView {
   element: HTMLDivElement;
   validator: Validator;
   constructor(public $object: JQuery, dataModel: ViewOptions, public emmiter: EventEmmiter) {
-    this.element = createSettings();
-    this.validator = new Validator([
-      { tag: 'range',  validators: ['required', 'min', 'max'] },
-      { tag: 'step',  validators: ['required', 'min', 'max'] },
-      { tag: 'values',  validators: ['required', 'min', 'max'] }
-    ]);
+    this.element = createSettings();    
     this.render($object, this.element);
     this.init(dataModel, this.element);
     this.onChangeSettings();
+
+    this.validator = new Validator(this.element, [
+      { tag: 'range',  validators: ['required', 'min', 'max', 'interval'] },
+      { tag: 'step',  validators: ['required', 'min', 'max'] },
+      { tag: 'values',  validators: ['required', 'min', 'max', 'interval'] }
+    ], { max: 2000, min: -1000 });
   }
 
   render($object: JQuery, view: HTMLDivElement): void {

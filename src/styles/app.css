@@ -24,9 +24,7 @@
   display: flex;
 }
 
-
-
-.slider_disabled {
+.slider.slider_disabled {
   pointer-events: none;
   background: #cdb1b1;
 }
@@ -43,8 +41,6 @@
   color: rgb(68, 58, 0);
   width: 190px;
 }
-
-
 
 .settings__item {
   position: relative;
@@ -137,6 +133,18 @@
   outline-color: darkred;
   color: red;
 }
+
+[data-valid="true"]::placeholder {
+  color: green;
+  font-size: 14px;
+}
+
+[data-valid="true"] {
+  border: 1px solid green;
+  outline-color: darkgreen;
+  color: green;
+}
+
 .settings__info,
 .settings__scale {
   width: 45%;

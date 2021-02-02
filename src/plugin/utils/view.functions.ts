@@ -150,6 +150,7 @@ function createElementsForValues(mode: Mode): HTMLInputElement[] {
   const length = mode === 'Single' ? 1 : 2;
   for (let index = 0; index < length; index++) {
     const inputWithValue: HTMLInputElement = createElement('input') as HTMLInputElement;
+    inputWithValue.name = 'values';
     inputWithValue.classList.add('values');
     inputWithValue.dataset.order = `${index}`;
     inputWithValue.type = 'text';
@@ -166,13 +167,22 @@ function createElement(tag: string, className?: string | string[]): HTMLElement 
   return element;
 }
 
+function computeDuration(inputs: NodeListOf<HTMLInputElement>): number {
+  if (inputs.length > 1) {
+    return +inputs[1].value - +inputs[0].value;
+  } else {
+    return 1;
+  }
+}
+
 export { 
   createSettings, 
   findElements, 
   setElementsForValues, 
   initValues,   
   setNodeValue, 
-  diversification
+  diversification,
+  computeDuration
 };
 
 export {
