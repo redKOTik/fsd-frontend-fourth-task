@@ -83,37 +83,49 @@ class Model implements IModel {
   // methods
 
   updateInfoFromSettings(value: boolean): void {
-    this.options.showValue = value;
-    this.emmiter.dispatch('model:setting-updated', {'showValue': this.options.showValue});
+    if (this.options.showValue !== value) {
+      this.options.showValue = value;
+      this.emmiter.dispatch('model:setting-updated', {'showValue': this.options.showValue});
+    }    
   }
 
   updateScaleFromSettings(value: boolean): void {
-    this.options.showScale = value;
-    this.emmiter.dispatch('model:setting-updated', {'showScale': this.options.showScale});
+    if (this.options.showScale !== value) {
+      this.options.showScale = value;
+      this.emmiter.dispatch('model:setting-updated', {'showScale': this.options.showScale});
+    }    
   }
 
   updateModeFromSettings(value: Mode): void {
-    this.options.mode = value;
-    this.emmiter.dispatch('model:mode-updated', {
-      'mode': this.options.mode, 
-      'defaultValue': this.options.defaultValue, 
-      'defaultInterval': this.options.defaultInterval
-    });
+    if (this.options.mode !== value) {
+      this.options.mode = value;
+      this.emmiter.dispatch('model:mode-updated', {
+        'mode': this.options.mode, 
+        'defaultValue': this.options.defaultValue, 
+        'defaultInterval': this.options.defaultInterval
+      });
+    }    
   }
 
   updateTypeFromSettings(value: Orientation): void {
-    this.options.orientation = value;
-    this.emmiter.dispatch('model:type-updated', {'view': this.options.orientation});
+    if (this.options.orientation !== value) {
+      this.options.orientation = value;
+      this.emmiter.dispatch('model:type-updated', {'view': this.options.orientation});
+    }    
   }
 
   updateRangeFromSettings(value: string, tag: 'minimumValue' | 'maximumValue'): void {
-    this.options[tag] = value;
-    this.emmiter.dispatch('model:range-updated', { [tag]: this.options[tag]});
+    if (this.options[tag] !== value) {
+      this.options[tag] = value;
+      this.emmiter.dispatch('model:range-updated', { [tag]: this.options[tag]});
+    }    
   }
 
   updateStepFromSettings(value: string): void {
-    this.options.step = value;
-    this.emmiter.dispatch('model:step-updated', { step: this.options.step});
+    if (this.options.step !== value) {
+      this.options.step = value;
+      this.emmiter.dispatch('model:step-updated', { step: this.options.step});
+    }    
   }
 
   updateValueFromScale(value: string): void {

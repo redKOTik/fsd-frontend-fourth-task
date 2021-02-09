@@ -25,3 +25,14 @@ type Emmiter = {
   [key: string]: Observer []
 };
 
+type Elements = {
+  showValueInput: HTMLInputElement,
+  showScaleInput: HTMLInputElement,
+  orientationInputs: NodeListOf<HTMLInputElement>,
+  modeInputs: NodeListOf<HTMLInputElement>,
+  stepInput: HTMLInputElement,
+  minInput: HTMLInputElement,
+  maxInput: HTMLInputElement,
+  valuesInput: HTMLInputElement[]
+};
+

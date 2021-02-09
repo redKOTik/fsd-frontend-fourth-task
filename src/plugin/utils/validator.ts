@@ -73,7 +73,11 @@ class Validator {
 
         if (validator === 'min') {
           if (field.validatorFns) {
-            field.validatorFns.min = Validator.min(this.globalInstructions.min);
+            if (field.tag === 'step') {
+              field.validatorFns.min = Validator.min(1);
+            } else {
+              field.validatorFns.min = Validator.min(this.globalInstructions.min);
+            }            
           }
         }
         
@@ -107,12 +111,10 @@ class Validator {
                 field.errors[key] = true;
               }            
               accIsValid = false;
-              this.makeFieldNotValid(element);
               this.errorHandler(element, key);
             } else {
               if (field.errors && field.errors[key]) {
                 delete field.errors[key];
-                this.makeFieldIsValid(element);
               }
             }
           }
@@ -120,8 +122,12 @@ class Validator {
       }
     }
 
+    accIsValid
+      ? this.makeFieldIsValid(element) 
+      : this.makeFieldNotValid(element);
+
     this.computeFormState(element);
-    return accIsValid;    
+    return this.formIsValid;    
   }
 
   computeFormState(field: HTMLInputElement): void {
@@ -194,26 +200,25 @@ class Validator {
   }
 
   showMessageTemporally(field: HTMLInputElement, message: string, dataType: string, hideTime: number): void {
-    this.showMessage(field, message, dataType);
-    setTimeout(this.hideMessage.bind(this, field, dataType), hideTime);
+    const popup = this.showMessage(field, message, dataType);
+    setTimeout(this.hideMessage.bind(this, popup), hideTime);
   }
 
-  hideMessage(field: HTMLInputElement, dataType: string): void {
+  hideMessage(popup: HTMLSpanElement): void {
     if (this.wrapper?.querySelectorAll('[data-show="true"]').length === 1) {
       this.wrapper.remove();
       this.wrapper = null;
     } else {
-      const span: HTMLSpanElement = field.parentNode?.querySelector(`.${'default' || field.className}-${dataType.toLowerCase()}`) as HTMLSpanElement;
-      if (span) {
-        span.dataset.show = 'false';
+      if (popup) {
+        popup.dataset.show = 'false';
         setTimeout(() => {
-          span.remove();
+          popup.remove();
         }, 1000);
       }
     }
   }
 
-  showMessage(field: HTMLInputElement, message: string, dataType: string): void {
+  showMessage(field: HTMLInputElement, message: string, dataType: string): HTMLSpanElement {
     console.log(this.wrapper);
     if (this.wrapper === null) {
       this.wrapper = this.createContainer();
@@ -230,6 +235,8 @@ class Validator {
     setTimeout(() => {
       span.dataset.show = 'true';
     }, 250)
+
+    return span;
   }
 
   formatField(field: HTMLInputElement): void {

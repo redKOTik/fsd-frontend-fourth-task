@@ -24,13 +24,13 @@ function createSettings(): HTMLDivElement {
   const htmlSettings = `            
         <div class="settings__info">
             <label>
-                <input class="info" type="checkbox">
+                <input name="info" class="info" type="checkbox">
                 <div class="instead_label">off/on labels</div>
             </label>
         </div>
         <div class="settings__scale">
             <label>
-                <input class="scale-input" type="checkbox">
+                <input name="scale" class="scale-input" type="checkbox">
                 <div class="instead_label">off/on scale</div>
             </label>
         </div>
@@ -69,6 +69,7 @@ function createSettings(): HTMLDivElement {
         <div class="settings__values">
             <fieldset>
                 <legend>Значения</legend>
+                <input name="values" class="values" data-order="0" type="text">
             </fieldset>
         </div>
         <div class="settings__item">
@@ -82,16 +83,18 @@ function createSettings(): HTMLDivElement {
   return divSettings;
 }
 
-function findElements(view: HTMLDivElement): {
-  showValueInput: HTMLInputElement,
-  showScaleInput: HTMLInputElement,
-  orientationInputs: NodeListOf<HTMLInputElement>,
-  modeInputs: NodeListOf<HTMLInputElement>,
-  stepInput: HTMLInputElement,
-  minInput: HTMLInputElement,
-  maxInput: HTMLInputElement,
-  divWithValue: HTMLDivElement
-} {
+function findInput(inputs: NodeListOf<HTMLInputElement>): HTMLInputElement | undefined{
+  let active;
+  inputs.forEach(input => {
+    if (input.checked) {
+      active = input as HTMLInputElement;
+    }
+  });
+
+  return active;
+}
+
+function findElements(view: HTMLDivElement): Elements {
   const showValueInput: HTMLInputElement = view.querySelector('.settings__info input') as HTMLInputElement;
   const showScaleInput: HTMLInputElement = view.querySelector('.settings__scale input') as HTMLInputElement;
   const orientationInputs: NodeListOf<HTMLInputElement> = view.querySelectorAll('.settings__view input');
@@ -99,7 +102,7 @@ function findElements(view: HTMLDivElement): {
   const stepInput: HTMLInputElement = view.querySelector('.settings__item .step') as HTMLInputElement;
   const minInput: HTMLInputElement = view.querySelector('.settings__item .range[name="minimum"]') as HTMLInputElement;
   const maxInput: HTMLInputElement = view.querySelector('.settings__item .range[name="maximum"]') as HTMLInputElement;
-  const divWithValue: HTMLDivElement = view.querySelector('.settings__values fieldset') as HTMLDivElement;
+  const valuesInput: HTMLInputElement = view.querySelector('.settings__values .values') as HTMLInputElement;
 
   return {
     showValueInput,
@@ -109,24 +112,27 @@ function findElements(view: HTMLDivElement): {
     stepInput,
     minInput,
     maxInput,
-    divWithValue
+    valuesInput: [valuesInput]
   }
 }
 
-function setElementsForValues(div: HTMLDivElement, mode: Mode): HTMLInputElement[] {
-  div.innerHTML = `<legend>Значения</legend>`;
-  const values: HTMLInputElement[] = createElementsForValues(mode);
-
-  if (mode === 'Single') {
-    div.append(values[0]);
-  } else {
-    div.append(values[0]);
-    div.append(values[1]);
+function makeValuesOfMode(inputs: HTMLInputElement[], mode: Mode): void {
+  const $fisrt = $(inputs[0]);
+  const $parent = $fisrt.parent();
+  
+  if (mode === 'Single' && inputs.length > 1) {
+    $(inputs[1]).remove();
+    inputs.pop();
   }
-  return values;
+
+  if (mode === 'Multiple') {
+    const second = cloneNode($fisrt);
+    $parent.append(second);
+    inputs.push(second);
+  }
 }
 
-function initValues(mode: Mode, values: HTMLInputElement[] | NodeListOf<HTMLInputElement>, defaultValue: string, defaultInterval: [string, string]): void {
+function initValues(mode: Mode, values: HTMLInputElement[], defaultValue: string, defaultInterval: [string, string]): void {
   if (mode === 'Single') {    
     values[0].value = defaultValue;
   } else {
@@ -145,19 +151,12 @@ function diversification(nodes: NodeListOf<HTMLInputElement>, id: string): NodeL
   return nodes;
 }
 
-function createElementsForValues(mode: Mode): HTMLInputElement[] {
-  const array: HTMLInputElement[] = [];
-  const length = mode === 'Single' ? 1 : 2;
-  for (let index = 0; index < length; index++) {
-    const inputWithValue: HTMLInputElement = createElement('input') as HTMLInputElement;
-    inputWithValue.name = 'values';
-    inputWithValue.classList.add('values');
-    inputWithValue.dataset.order = `${index}`;
-    inputWithValue.type = 'text';
-    array.push(inputWithValue);      
-  }
-  return array;
+function cloneNode($input: JQuery): HTMLInputElement {
+  const clone = $input.clone()[0] as HTMLInputElement;
+  clone.dataset.order = `${1}`;
+  return clone;
 }
+
 function createElement(tag: string, className?: string | string[]): HTMLElement {
   const element: HTMLElement = document.createElement(tag);
 
@@ -178,11 +177,12 @@ function computeDuration(inputs: NodeListOf<HTMLInputElement>): number {
 export { 
   createSettings, 
   findElements, 
-  setElementsForValues, 
+  makeValuesOfMode, 
   initValues,   
   setNodeValue, 
   diversification,
-  computeDuration
+  computeDuration,
+  findInput
 };
 
 export {

@@ -3,11 +3,12 @@ import { Validator } from '../utils/validator';
 
 import {
   createSettings,
-  setElementsForValues,
+  makeValuesOfMode,
   initValues,
   findElements,
   setNodeValue,
-  diversification
+  diversification,
+  findInput
 } from '../utils/view.functions';
 
 interface ISettingsView {
@@ -25,11 +26,12 @@ interface ISettingsView {
  */
 class SettingsView implements ISettingsView {
   element: HTMLDivElement;
+  elements: Elements;
   validator: Validator;
   constructor(public $object: JQuery, dataModel: ViewOptions, public emmiter: EventEmmiter) {
     this.element = createSettings();    
     this.render($object, this.element);
-    this.init(dataModel, this.element);
+    this.elements = this.init(dataModel, this.element);
     this.onChangeSettings();
 
     this.validator = new Validator(this.element, [
@@ -42,60 +44,56 @@ class SettingsView implements ISettingsView {
   render($object: JQuery, view: HTMLDivElement): void {
     $object.before(view);
   }
-
-  init(data: ViewOptions, view: HTMLDivElement): void {
-    const {
-      showValueInput,
-      showScaleInput,
-      orientationInputs,
-      modeInputs,
-      stepInput,
-      minInput,
-      maxInput,
-      divWithValue } = findElements(view);
-    const values: HTMLInputElement[] = setElementsForValues(divWithValue, data.mode);
+  
+  init(data: ViewOptions, view: HTMLDivElement): Elements {
+    const elements: Elements = findElements(view);
+    makeValuesOfMode(elements.valuesInput, data.mode);
     const siblings: HTMLDivElement = view.nextSibling as HTMLDivElement;
 
-    showValueInput.checked = data.showValue;
-    showScaleInput.checked = data.showScale;   
-    setNodeValue(diversification(orientationInputs, siblings.id), data.orientation);
-    setNodeValue(diversification(modeInputs, siblings.id), data.mode);
-    stepInput.value = data.step;
-    minInput.value = data.minimumValue;
-    maxInput.value = data.maximumValue;
-    initValues(data.mode, values, data.defaultValue, data.defaultInterval);
+    elements.showValueInput.checked = data.showValue;
+    elements.showScaleInput.checked = data.showScale;   
+    setNodeValue(diversification(elements.orientationInputs, siblings.id), data.orientation);
+    setNodeValue(diversification(elements.modeInputs, siblings.id), data.mode);
+    elements.stepInput.value = data.step;
+    elements.minInput.value = data.minimumValue;
+    elements.maxInput.value = data.maximumValue;
+    initValues(data.mode, elements.valuesInput, data.defaultValue, data.defaultInterval);
+
+    return elements;
   }
 
   // handler
   changeSettingsHandler(event: Event): void {
     const target: HTMLInputElement = event.target as HTMLInputElement;
-    switch (target.className) {
-      case 'info':
-        this.emmiter.dispatch('setting:info-changed', { showValue: target.checked });
-        return;
-      case 'scale-input':
-        this.emmiter.dispatch('setting:scale-changed', { showScale: target.checked });
-        return;
-      case 'mode':
-        this.emmiter.dispatch('setting:mode-changed', { mode: target.value });
-        return;
-      case 'view':
-        this.emmiter.dispatch('setting:type-changed', { view: target.value });
-        return; 
-      case'range':
-        if (this.validator.validate('range', target))
-          this.emmiter.dispatch('setting:range-changed', {value: target.value, tag: `${target.name}Value` });
-        return;
-      case 'step':
-        if (this.validator.validate('step', target))
-          this.emmiter.dispatch('setting:step-changed', { step: target.value });
-        return;
-      case 'values':
-        if (target.dataset.order) {
-          if (this.validator.validate('values', target))
-            this.emmiter.dispatch('setting:value-changed', { value: target.value, index: target.dataset.order });
-        }        
-        return;
+
+    if (['range', 'step', 'values'].includes(target.className)) {
+      this.validator.validate(target.className, target);
+    }
+
+    if (this.validator.formIsValid) {
+      this.emmiter.dispatch('setting:info-changed', { showValue: this.elements.showValueInput.checked });
+      this.emmiter.dispatch('setting:scale-changed', { showScale: this.elements.showScaleInput.checked });
+
+      const modeInput = findInput(this.elements.modeInputs);
+      if (modeInput) {
+        this.emmiter.dispatch('setting:mode-changed', { mode: modeInput.value });
+      }
+
+      const typeInput = findInput(this.elements.orientationInputs);
+      if (typeInput) {
+        this.emmiter.dispatch('setting:type-changed', { view: typeInput.value });
+      }
+
+      this.emmiter.dispatch('setting:range-changed', {value: this.elements.maxInput.value, tag: `${this.elements.maxInput.name}Value` });
+      this.emmiter.dispatch('setting:range-changed', {value: this.elements.minInput.value, tag: `${this.elements.minInput.name}Value` });
+
+      this.emmiter.dispatch('setting:step-changed', { step: this.elements.stepInput.value });
+      
+      this.elements.valuesInput.forEach(input => {
+        if (input.dataset.order) {
+          this.emmiter.dispatch('setting:value-changed', { value: input.value, index: input.dataset.order });
+        }
+      });
     }
   }
 
@@ -106,41 +104,33 @@ class SettingsView implements ISettingsView {
 
   // model handler
   handleSettingsViewChanged: (data: Options) => void = (data: Options) => {
-    const {
-      showValueInput,
-      showScaleInput,
-      orientationInputs,
-      modeInputs,
-      stepInput,
-      minInput,
-      maxInput,
-      divWithValue } = findElements(this.element);
     switch (Object.keys(data)[0]) {
       case 'showValue':
-        showValueInput.checked = data.showValue as boolean;
+        this.elements.showValueInput.checked = data.showValue as boolean;
         break;
       case 'showScale':
-        showScaleInput.checked = data.showScale as boolean;
+        this.elements.showScaleInput.checked = data.showScale as boolean;
         break;
       case 'orientation':
-        setNodeValue(orientationInputs, data.orientation as Orientation);
+        setNodeValue(this.elements.orientationInputs, data.orientation as Orientation);
         break;
       case 'mode':
-        setNodeValue(modeInputs, data.mode as Mode);
-        initValues(data.mode as Mode, setElementsForValues(divWithValue, data.mode as Mode), data.defaultValue as string, data.defaultInterval as [string, string]);
+        setNodeValue(this.elements.modeInputs, data.mode as Mode);
+        makeValuesOfMode(this.elements.valuesInput, data.mode as Mode);
+        initValues(data.mode as Mode, this.elements.valuesInput, data.defaultValue as string, data.defaultInterval as [string, string]);
         break;
       case 'step':
-        stepInput.value = data.step as string;
+        this.elements.stepInput.value = data.step as string;
         break;
       case 'minimumValue':
-        minInput.value = data.minimumValue as string;
+        this.elements.minInput.value = data.minimumValue as string;
         break;
       case 'maximumValue':
-        maxInput.value = data.maximumValue as string;
+        this.elements.maxInput.value = data.maximumValue as string;
         break;
       case 'defaultValue':
       case 'defaultInterval':
-        initValues(data.mode as Mode, setElementsForValues(divWithValue, data.mode as Mode), data.defaultValue as string, data.defaultInterval as [string, string]);
+        initValues(data.mode as Mode, this.elements.valuesInput, data.defaultValue as string, data.defaultInterval as [string, string]);
         break;         
     }
   }
