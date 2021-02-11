@@ -42,7 +42,8 @@
   width: 190px;
 }
 
-.settings__item {
+.settings__item,
+.settings__range {
   position: relative;
 }
 

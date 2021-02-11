@@ -38,7 +38,7 @@ class SettingsView implements ISettingsView {
       { tag: 'range',  validators: ['required', 'min', 'max', 'interval'] },
       { tag: 'step',  validators: ['required', 'min', 'max'] },
       { tag: 'values',  validators: ['required', 'min', 'max', 'interval'] }
-    ], { max: 2000, min: -1000 });
+    ], { max: 2000, min: -100 });
   }
 
   render($object: JQuery, view: HTMLDivElement): void {
@@ -117,7 +117,7 @@ class SettingsView implements ISettingsView {
       case 'mode':
         setNodeValue(this.elements.modeInputs, data.mode as Mode);
         makeValuesOfMode(this.elements.valuesInput, data.mode as Mode);
-        initValues(data.mode as Mode, this.elements.valuesInput, data.defaultValue as string, data.defaultInterval as [string, string]);
+        initValues(data.mode as Mode, this.elements.valuesInput, data.defaultValue as string, data.defaultInterval);
         break;
       case 'step':
         this.elements.stepInput.value = data.step as string;
@@ -130,7 +130,7 @@ class SettingsView implements ISettingsView {
         break;
       case 'defaultValue':
       case 'defaultInterval':
-        initValues(data.mode as Mode, this.elements.valuesInput, data.defaultValue as string, data.defaultInterval as [string, string]);
+        initValues(data.mode as Mode, this.elements.valuesInput, data.defaultValue as string, data.defaultInterval);
         break;         
     }
   }

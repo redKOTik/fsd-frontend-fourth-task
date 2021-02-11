@@ -4,7 +4,7 @@ import {
 
 type validator = (value: string) => boolean;
 type limitValidator = (limit: number) => validator;
-type intervalValidator = (inputs: NodeListOf<HTMLInputElement>) => validator
+type intervalValidator = (main: HTMLDivElement) => validator
 
 type validatorFns = {
   required?: validator,
@@ -41,7 +41,7 @@ class Validator {
   static required: validator = val => !!val;
   static max: limitValidator = maxNum => (val: string): boolean => +val <= maxNum;
   static min: limitValidator = minNum => (val: string): boolean => +val >= minNum;
-  static interval: intervalValidator = inputs => (_: string): boolean => computeDuration(inputs) > 0;
+  static interval: intervalValidator = main => (_: string): boolean => computeDuration(main);
 
   formIsValid = true;
   wrapper: HTMLDivElement | null = null;
@@ -83,15 +83,15 @@ class Validator {
         
         if (validator === 'interval') {
           if (field.validatorFns) {
-            field.validatorFns.interval = Validator.interval(this.findInputs(field.tag));
+            field.validatorFns.interval = Validator.interval(this.findInputsWrapper(field.tag));
           }
         } 
       });      
     });
   }
 
-  findInputs(tag: string): NodeListOf<HTMLInputElement> {
-    return this.main.querySelectorAll(`.${tag}`) as NodeListOf<HTMLInputElement>;
+  findInputsWrapper(tag: string): HTMLDivElement {
+    return this.main.querySelector(`.settings__${tag}`) as HTMLDivElement;
   } 
 
   validate(tag: string, element: HTMLInputElement): boolean {
@@ -99,6 +99,7 @@ class Validator {
     let accIsValid = true;
     const field = this.instructions.find(field => field.tag === tag);
     const validators = field?.validatorFns;
+    const index = element.dataset.order ? '-' + element.dataset.order : '';
     
     if (field) {
       if (validators) {
@@ -108,14 +109,25 @@ class Validator {
           if (fn) {          
             if (!fn(element.value)) {
               if (field.errors) {
-                field.errors[key] = true;
+                field.errors[key+index] = true;
               }            
               accIsValid = false;
               this.errorHandler(element, key);
             } else {
-              if (field.errors && field.errors[key]) {
-                delete field.errors[key];
-              }
+
+              if (key === 'interval') {
+                if (field.errors && field.errors[key+'-0']) {
+                  delete field.errors[key+'-0'];
+                }
+
+                if (field.errors && field.errors[key+'-1']) {
+                  delete field.errors[key+'-1'];
+                }
+              } else {
+                if (field.errors && field.errors[key+index]) {
+                  delete field.errors[key+index];
+                }
+              }              
             }
           }
         });
@@ -125,19 +137,33 @@ class Validator {
     accIsValid
       ? this.makeFieldIsValid(element) 
       : this.makeFieldNotValid(element);
-
+      
     this.computeFormState(element);
+    
+    if (this.formIsValid) {
+      const inputs = this.main.querySelectorAll('input[data-valid="false"]');
+      if (inputs) {
+        inputs.forEach(input => {
+          if (input instanceof HTMLInputElement) {
+            input.dataset.valid = 'true'
+          }
+        });
+      }      
+    }
     return this.formIsValid;    
   }
 
   computeFormState(field: HTMLInputElement): void {
     let accIsValid = true;
 
-    this.instructions.forEach(field => {      
-      const count = Object.keys(field.errors!).length;
-      if (count > 0) {
-        accIsValid = false;
-      }
+    this.instructions.forEach(field => { 
+      if (field.errors) {
+        const count = Object.keys(field.errors).length;
+        if (count > 0) {
+          accIsValid = false;
+        }
+      }     
+      
     });
 
     this.formIsValid = accIsValid;    
@@ -145,33 +171,33 @@ class Validator {
     this.showValidatorState();
   }
 
-  toggleSliderState(field: HTMLInputElement) {
+  toggleSliderState(field: HTMLInputElement): void {
     const wrapper = field.closest('.settings')?.nextElementSibling;
     const slider = wrapper?.querySelector('.slider')
     slider?.classList.toggle('slider_disabled', !this.formIsValid);
   }
 
-  makeFieldNotValid(field: HTMLInputElement) {
+  makeFieldNotValid(field: HTMLInputElement): void  {
     field.dataset.valid = 'false';
   }
 
-  makeFieldIsValid(field: HTMLInputElement) {
+  makeFieldIsValid(field: HTMLInputElement): void  {
     field.dataset.valid = 'true';
   }
 
-  makeMessage(value: string, type: string): string {
+  makeMessage(value: string, type: string, key: string): string {
     let message = '';
 
     switch(type) {
       case 'minimum':
       case 'maximum':  
-        message = `значение ${value} выходит за установленные границы`;
+        message = `значение ${value} выходит за установленные границы (${key})`;
         return message;
       case 'values':
-        message = `значение ${value} не допустимо`;
+        message = `значение ${value} не допустимо (${key})`;
         return message;
       case 'step':
-        message = `значение ${value} не допустимо`;
+        message = `значение ${value} не допустимо (${key})`;
         return message;
       default:
         return message;    
@@ -184,16 +210,16 @@ class Validator {
 
     switch(key) {
       case 'min': 
-        this.showMessageTemporally(field, this.makeMessage(field.value, field.name), field.name, 4000);
+        this.showMessageTemporally(field, this.makeMessage(field.value, field.name, key), field.name, 4000);
         return;
       case 'max': 
-        this.showMessageTemporally(field, this.makeMessage(field.value, field.name), field.name, 4000);
+        this.showMessageTemporally(field, this.makeMessage(field.value, field.name, key), field.name, 4000);
         return;  
       case 'required':        
-        this.showMessageTemporally(field, `поле '${text}' является обязательным и должно быть заполнено`, field.name, 4000);
+        this.showMessageTemporally(field, `поле '${text as string}' является обязательным и должно быть заполнено`, field.name, 4000);
         return;
       case 'interval':        
-      this.showMessageTemporally(field, this.makeMessage(field.value, field.name), field.name, 4000);
+      this.showMessageTemporally(field, this.makeMessage(field.value, field.name, key), field.name, 4000);
         return;  
     }
 
@@ -257,7 +283,7 @@ class Validator {
     return wrapper;
   }
 
-  showValidatorState() {
+  showValidatorState(): void {
     console.log('state', this.formIsValid, this.instructions);
   }
 }

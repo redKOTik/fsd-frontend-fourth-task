@@ -142,12 +142,14 @@ class Model implements IModel {
   }
 
   updateValueFromThumb(value: string, index: number): void {
-    if (this.options.mode === 'Multiple') {      
-      this.options.defaultInterval[index] = value;
-      this.emmiter.dispatch('model:value-changed', {'defaultInterval': this.options.defaultInterval, 'mode': this.options.mode});
+    if (this.options.mode === 'Multiple') {
+      if (this.options.defaultInterval[index] !== value) {
+        this.options.defaultInterval[index] = value;        
+        this.emmiter.dispatch('model:value-changed', {'defaultInterval': { 'value': this.options.defaultInterval[index], index }, 'mode': this.options.mode});
+      } 
     } else {
       this.options.defaultValue = value;
-      this.emmiter.dispatch('model:value-changed', {'defaultValue': this.options.defaultValue, 'mode': this.options.mode});  
+      this.emmiter.dispatch('model:value-changed', {'defaultValue': this.options.defaultValue, 'mode': this.options.mode});        
     }
   }
 
@@ -162,7 +164,7 @@ class Model implements IModel {
 
   // view handlers
 
-  handleThumbMoved: (data: DispatchData) => void = (data: DispatchData) => {
+  handleThumbMoved: (data: DispatchData) => void = (data: DispatchData) => {    
     const value = data.value 
       ? data.value as string 
       : this.defineValueFromPixel(data.position as number, data.step as number);

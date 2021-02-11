@@ -238,6 +238,7 @@ class View implements IView {
   // model handlers
 
   handleValueChanged: (data: DispatchData) => void = (data: DispatchData) => {
+    const params = data['defaultInterval'] as IntervalData;
     Object.keys(data).forEach(key => {
       switch (key) {
         case 'defaultValue':
@@ -245,8 +246,8 @@ class View implements IView {
           if (this.options.mode === 'Single')
             this.updateThumb(this.component.thumbs[0], this.options.defaultValue);
           break;
-        case 'defaultInterval':
-          this.options.defaultInterval = data['defaultInterval'] as [string, string];
+        case 'defaultInterval':          
+          this.options.defaultInterval[params['index']] = params['value'];
           if (this.options.mode === 'Multiple')
             this.component.thumbs.forEach((thumb, index) => {
               this.updateThumb(thumb, this.options.defaultInterval[index]);

@@ -16,8 +16,13 @@ type Unsubables = {
   unsubscribe: () => void 
 };
 
+type IntervalData = {
+  'index': number,
+  'value': string
+}
+
 type DispatchData = {
-  [key: string]: string | number | Mode | Orientation | boolean | [string, string]
+  [key: string]: string | number | Mode | Orientation | boolean | [string, string] | IntervalData;
 };
 
 type Observer = (data: DispatchData) => void;

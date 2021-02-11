@@ -13,7 +13,7 @@ type Options = {
   showValue?: boolean,
   showScale?: boolean,
   defaultValue?: string,
-  defaultInterval?: [string, string],
+  defaultInterval?: [string, string] | IntervalData,
   minimumValue?: string,
   maximumValue?: string,
   step?: string,

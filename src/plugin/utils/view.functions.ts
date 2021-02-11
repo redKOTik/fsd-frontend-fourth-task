@@ -72,11 +72,11 @@ function createSettings(): HTMLDivElement {
                 <input name="values" class="values" data-order="0" type="text">
             </fieldset>
         </div>
-        <div class="settings__item">
+        <div class="settings__range">
             <fieldset>
             <legend>Границы</legend>
-            <input class="range" name="minimum" type="text" placeholder="Минимальное значение">
-            <input class="range" name="maximum" type="text" placeholder="Максимальное значение"></fieldset>
+            <input class="range" name="minimum" type="text" data-order="0" placeholder="Минимальное значение">
+            <input class="range" name="maximum" type="text" data-order="1" placeholder="Максимальное значение"></fieldset>
         </div>`;
   const divSettings: HTMLDivElement = createElement('div', 'settings') as HTMLDivElement;
   divSettings.insertAdjacentHTML('afterbegin', htmlSettings);
@@ -87,7 +87,7 @@ function findInput(inputs: NodeListOf<HTMLInputElement>): HTMLInputElement | und
   let active;
   inputs.forEach(input => {
     if (input.checked) {
-      active = input as HTMLInputElement;
+      active = input;
     }
   });
 
@@ -100,8 +100,8 @@ function findElements(view: HTMLDivElement): Elements {
   const orientationInputs: NodeListOf<HTMLInputElement> = view.querySelectorAll('.settings__view input');
   const modeInputs: NodeListOf<HTMLInputElement> = view.querySelectorAll('.settings__mode input');
   const stepInput: HTMLInputElement = view.querySelector('.settings__item .step') as HTMLInputElement;
-  const minInput: HTMLInputElement = view.querySelector('.settings__item .range[name="minimum"]') as HTMLInputElement;
-  const maxInput: HTMLInputElement = view.querySelector('.settings__item .range[name="maximum"]') as HTMLInputElement;
+  const minInput: HTMLInputElement = view.querySelector('.settings__range .range[name="minimum"]') as HTMLInputElement;
+  const maxInput: HTMLInputElement = view.querySelector('.settings__range .range[name="maximum"]') as HTMLInputElement;
   const valuesInput: HTMLInputElement = view.querySelector('.settings__values .values') as HTMLInputElement;
 
   return {
@@ -132,12 +132,18 @@ function makeValuesOfMode(inputs: HTMLInputElement[], mode: Mode): void {
   }
 }
 
-function initValues(mode: Mode, values: HTMLInputElement[], defaultValue: string, defaultInterval: [string, string]): void {
+function initValues(mode: Mode, values: HTMLInputElement[], defaultValue: string, defaultInterval?: [string, string] | IntervalData): void {
   if (mode === 'Single') {    
     values[0].value = defaultValue;
   } else {
-    values[0].value = defaultInterval[0];
-    values[1].value = defaultInterval[1];
+    if (defaultInterval) {
+      if (defaultInterval instanceof Array) {
+        values[0].value = defaultInterval[0];
+        values[1].value = defaultInterval[1];
+      } else {
+        values[defaultInterval.index].value = defaultInterval.value;
+      } 
+    }       
   }
 }
 
@@ -166,11 +172,15 @@ function createElement(tag: string, className?: string | string[]): HTMLElement 
   return element;
 }
 
-function computeDuration(inputs: NodeListOf<HTMLInputElement>): number {
+function computeDuration(main: HTMLDivElement): boolean {
+
+  const inputs = main.querySelectorAll('input');
+
   if (inputs.length > 1) {
-    return +inputs[1].value - +inputs[0].value;
+    const correctInterval = (+inputs[1].value - +inputs[0].value) > 0;    
+    return correctInterval;
   } else {
-    return 1;
+    return true;
   }
 }
 
