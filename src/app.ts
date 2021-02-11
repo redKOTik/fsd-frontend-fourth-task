@@ -9,8 +9,9 @@ $slider.sliderPlugin({
   mode: 'Multiple',
   orientation: 'Vertical',
   defaultValue: '550',
-  defaultInterval: ['150', '800'],
-  maximumValue: '1500',
+  defaultInterval: ['150', '250'],
+  minimumValue: '100',
+  maximumValue: '300',
   showSettings: true,
   showValue: true,
   onValueChanged: function (_, change) {
@@ -55,7 +56,7 @@ $slider3.sliderPlugin({
 // }, 9000);
 
 // setTimeout(() => {
-//   $slider3.sliderPlugin('update', { showScale: false, showValue: false, defaultInterval: ['1', '99'] });
+//   $slider.sliderPlugin('update', { showScale: true, showValue: true, defaultInterval: ['150', '250'] });
 // }, 10000);
 
 // setTimeout(() => {

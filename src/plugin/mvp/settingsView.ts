@@ -38,7 +38,7 @@ class SettingsView implements ISettingsView {
       { tag: 'range',  validators: ['required', 'min', 'max', 'interval'] },
       { tag: 'step',  validators: ['required', 'min', 'max'] },
       { tag: 'values',  validators: ['required', 'min', 'max', 'interval'] }
-    ], { max: 2000, min: -100 });
+    ], { max: +dataModel.maximumValue, min: +dataModel.minimumValue });
   }
 
   render($object: JQuery, view: HTMLDivElement): void {

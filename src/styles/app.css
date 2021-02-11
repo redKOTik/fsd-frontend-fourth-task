@@ -60,19 +60,6 @@
 }
 
 .popup-container {
-  /* position: absolute;
-  top: 0;
-  right: -320px;
-  width: 300px;
-  height: auto;
-  max-height: 430px;  
-  margin-left: 1em;
-
-  display: flex;
-  flex-wrap: nowrap;
-  flex-direction: column;
-  overflow: hidden; */
-  
   position: fixed;
   z-index: 10000;
   padding: 5px 5px 0 0;

@@ -224,7 +224,7 @@ class View implements IView {
     //this.reHangEventListeners();
   }
 
-  updateThumb(thumb: Thumb, value: string): void {
+  updateThumb(thumb: Thumb, value: string): void {    
     thumb
       .setOnElementDefaultValue(value)
       .setOnElementDefaultPosition(
@@ -237,8 +237,7 @@ class View implements IView {
 
   // model handlers
 
-  handleValueChanged: (data: DispatchData) => void = (data: DispatchData) => {
-    const params = data['defaultInterval'] as IntervalData;
+  handleValueChanged: (data: DispatchData) => void = (data: DispatchData) => {    
     Object.keys(data).forEach(key => {
       switch (key) {
         case 'defaultValue':
@@ -246,12 +245,18 @@ class View implements IView {
           if (this.options.mode === 'Single')
             this.updateThumb(this.component.thumbs[0], this.options.defaultValue);
           break;
-        case 'defaultInterval':          
-          this.options.defaultInterval[params['index']] = params['value'];
-          if (this.options.mode === 'Multiple')
-            this.component.thumbs.forEach((thumb, index) => {
-              this.updateThumb(thumb, this.options.defaultInterval[index]);
-            });          
+        case 'defaultInterval':
+          if (this.options.mode === 'Multiple') 
+            if (data['defaultInterval'] instanceof Array) {
+              this.options.defaultInterval = data['defaultInterval'] as [string, string];              
+              this.component.thumbs.forEach((thumb, index) => {
+                this.updateThumb(thumb, this.options.defaultInterval[index]);
+              });
+            } else {
+              const params = data['defaultInterval'] as IntervalData;
+              this.options.defaultInterval[params['index']] = params['value'];
+              this.updateThumb(this.component.thumbs[params['index']], this.options.defaultInterval[params['index']]);
+            }
           break;
       }
     });    

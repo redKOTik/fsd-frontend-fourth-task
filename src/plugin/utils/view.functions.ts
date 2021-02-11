@@ -125,7 +125,7 @@ function makeValuesOfMode(inputs: HTMLInputElement[], mode: Mode): void {
     inputs.pop();
   }
 
-  if (mode === 'Multiple') {
+  if (mode === 'Multiple' && inputs.length === 1) {
     const second = cloneNode($fisrt);
     $parent.append(second);
     inputs.push(second);

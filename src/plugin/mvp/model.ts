@@ -143,10 +143,8 @@ class Model implements IModel {
 
   updateValueFromThumb(value: string, index: number): void {
     if (this.options.mode === 'Multiple') {
-      if (this.options.defaultInterval[index] !== value) {
-        this.options.defaultInterval[index] = value;        
-        this.emmiter.dispatch('model:value-changed', {'defaultInterval': { 'value': this.options.defaultInterval[index], index }, 'mode': this.options.mode});
-      } 
+      this.options.defaultInterval[index] = value;        
+      this.emmiter.dispatch('model:value-changed', {'defaultInterval': { 'value': this.options.defaultInterval[index], index }, 'mode': this.options.mode});
     } else {
       this.options.defaultValue = value;
       this.emmiter.dispatch('model:value-changed', {'defaultValue': this.options.defaultValue, 'mode': this.options.mode});        
