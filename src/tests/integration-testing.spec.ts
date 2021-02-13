@@ -43,7 +43,7 @@ describe('Интеграционное тестирование компонен
   });
 
   test('проверить изменение данных модели после изменения настроек вида (изменение минимальной границы)', () => {
-    const rangeValue = '-10';
+    const rangeValue = '15';
     const rangeInput = presentor.settings!.element.querySelector('.range:first-of-type') as HTMLInputElement;
     rangeInput.value = rangeValue;
 
@@ -54,7 +54,7 @@ describe('Интеграционное тестирование компонен
   });
 
   test('проверить изменение данных модели после изменения настроек вида (изменение максимальной границы)', () => {
-    const rangeValue = '120';
+    const rangeValue = '90';
     const rangeInput = presentor.settings!.element.querySelector('.range:last-of-type') as HTMLInputElement;
     rangeInput.value = rangeValue;
 

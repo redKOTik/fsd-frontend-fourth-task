@@ -1,3 +1,5 @@
+import $ from 'jquery';
+
 function calcDelta(options: ViewOptions): number {
   return +options.maximumValue - +options.minimumValue;
 }

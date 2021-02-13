@@ -11,7 +11,7 @@ $slider.sliderPlugin({
   defaultValue: '550',
   defaultInterval: ['150', '250'],
   minimumValue: '100',
-  maximumValue: '300',
+  maximumValue: '500',
   showSettings: true,
   showValue: true,
   onValueChanged: function (_, change) {

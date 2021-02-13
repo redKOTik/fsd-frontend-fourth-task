@@ -58,6 +58,7 @@ class Thumb extends Component {
     const $label = $(this.element).parent().find(this.label.element);
     if ($label.length === 0)
       this.element.insertAdjacentElement('beforebegin', this.label.element);
+      this.label.activeLabel = true;
     return this;      
   }  
   

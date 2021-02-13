@@ -245,7 +245,6 @@ class Validator {
   }
 
   showMessage(field: HTMLInputElement, message: string, dataType: string): HTMLSpanElement {
-    console.log(this.wrapper);
     if (this.wrapper === null) {
       this.wrapper = this.createContainer();
     }
