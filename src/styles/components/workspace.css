@@ -1,0 +1,21 @@
+/* Workspace */
+
+.slider {
+  position: relative;
+  background: #ffffff;
+
+  border: 1px solid rgba(31, 32, 65, 0.25);
+  box-sizing: border-box;
+  border-radius: 3px; 
+}
+
+.slider__horizontal {
+  min-width: 240px;
+  height: 6px;
+}
+
+.slider__vertical {
+  width: 6px;
+  height: 100%;
+  min-height: 240px;
+}

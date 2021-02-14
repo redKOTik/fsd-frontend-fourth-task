@@ -1,0 +1,153 @@
+.settings {
+  position: relative;
+  width: 20rem;
+  margin-left: 1em;
+  min-height: 480px;
+}
+
+.settings fieldset {
+  border-radius: 2px;
+  border: 1px solid goldenrod;
+  color: rgb(68, 58, 0);
+  width: 190px;
+}
+
+.settings__item,
+.settings__range {
+  position: relative;
+}
+
+.step,
+.range,
+.values {
+  width: 10rem;
+  padding: 0.2rem 0.5rem;
+  margin: 0.2em;
+  border: 1px solid black;
+  border-radius: 2px;
+}
+
+.settings__info,
+.settings__scale {
+  width: 45%;
+}
+
+.settings__info input,
+.settings__scale input {
+  position: absolute;
+  z-index: -1;
+  opacity: 0;
+}
+
+.settings__info input + .instead_label,
+.settings__scale input + .instead_label {
+  position: relative;
+  cursor: pointer;
+  padding: 0 0 0 65px;
+  font: 14px Georgia;
+  line-height: 24px;
+}
+
+.settings__info input + .instead_label:before,
+.settings__scale input + .instead_label:before {
+  content: "";
+  position: absolute;
+  width: 40px;
+  height: 20px;
+  border: 1px solid rgba(31, 32, 65, 0.25);
+  border-radius: 10px;
+  background: #ffffff;
+  transition: 0.2s;
+  left: 15px;
+}
+
+.settings__info input + .instead_label:after,
+.settings__scale input + .instead_label:after {
+  content: "";
+  position: absolute;
+  left: 20px;
+  top: 5px;
+  width: 12px;
+  height: 12px;
+  background: rgba(31, 32, 65, 0.25);
+  border-radius: 50%;
+  transition: 0.2s;
+}
+
+.settings__info input:checked + .instead_label:before,
+.settings__scale input:checked + .instead_label:before {
+  border: 1px solid goldenrod;
+  transition: 0.2s;
+}
+
+.settings__info input:checked + .instead_label:after,
+.settings__scale input:checked + .instead_label:after {
+  left: 40px;
+  top: 5px;
+  background: rgb(68, 58, 0);
+  transition: 0.2s;
+}
+
+.view + .label,
+.mode + .label {
+  font: 12px Georgia;
+  line-height: 15px;
+  margin-bottom: 5px;
+  /* Dark 100% */
+  color: #1f2041;
+}
+
+.view,
+.mode {
+  position: absolute;
+  z-index: -1;
+  opacity: 0;
+}
+
+.view + .label,
+.mode + .label {
+  position: relative;
+  cursor: pointer;
+  padding: 0 0 0 50px;
+  font: 14px Georgia;
+  line-height: 24px;
+}
+
+.view + .label:before,
+.mode + .label:before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 1px solid rgba(31, 32, 65, 0.25);
+  border-radius: 50%;
+  background: #ffffff;
+  left: 15px;
+  top: 0px;
+}
+
+.view + .label:after,
+.mode + .label:after {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(180deg, goldenrod 0%, rgb(68, 58, 0) 100%);
+  border-radius: 50%;
+  opacity: 0;
+  transition: 0.2s;
+  left: 20px;
+  top: 5px;
+}
+
+.view:checked + .label:before,
+.mode:checked + .label:before {
+  border: 1px solid goldenrod;
+  transition: 0.2s;
+}
+
+.view:checked + .label:after,
+.mode:checked + .label:after {
+  opacity: 1;
+  transition: 0.2s;
+}

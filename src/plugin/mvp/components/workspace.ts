@@ -14,8 +14,11 @@ class Workspace extends Component {
   element: HTMLDivElement;
   space: OwnSpace = {
     start: 0, // начальная точка пространства (px) 
-    end: 0 // конечная точнка пространства (px)
+    end: 0 // конечная точка пространства (px)
   };
+
+  unit = 0; // величина 1px
+  offset = 0; // workspace (px)
   step = 0; // шаг (px)
   delta = 0; // числовая разница (max - min)
 
@@ -29,8 +32,14 @@ class Workspace extends Component {
     return createElement('div', ['slider', `slider__${key.toLowerCase()}`]) as HTMLDivElement;
   }
 
-  getUnitMeasure(): number {
-    return this.space.end / this.delta;
+  computeOffset(): this {
+    this.offset = this.element[this.styleKeys.offset] - 2;
+    return this;
+  }
+
+  computeUnitMeasure(): this {    
+    this.unit = this.offset / this.delta;
+    return this;
   }
 
   setDelta(delta: number): this {
@@ -38,9 +47,9 @@ class Workspace extends Component {
     return this;
   }
 
-  computeSpace(minimum: number): this {
-    this.space.end = this.element[this.styleKeys.offset] - 2;
-    this.space.start = this.space.end / this.delta * minimum;
+  computeSpace(maximum: number, minimum: number): this {    
+    this.space.end = this.unit * maximum;
+    this.space.start = this.unit * minimum;
     return this;
   }
 
@@ -71,10 +80,10 @@ class Workspace extends Component {
   }    
 
   computeNewOffsetPosition(now: number, options: HandleOptions): number {
-    let newOffsetPosition = stepBalancing(now, this.step, options.ownSpace.start);
-    if (newOffsetPosition < options.ownSpace.start || now < options.ownSpace.start) {
+    let newOffsetPosition = stepBalancing(now, this.step);
+    if (newOffsetPosition <= options.ownSpace.start || now <= options.ownSpace.start) {
       newOffsetPosition = options.ownSpace.start;
-    } else if (newOffsetPosition > options.ownSpace.end || now > options.ownSpace.end) {
+    } else if (newOffsetPosition >= options.ownSpace.end || now >= options.ownSpace.end) {
       newOffsetPosition = options.ownSpace.end;
     }
     return newOffsetPosition;
@@ -85,12 +94,12 @@ class Workspace extends Component {
       ? options.ownSpace = { 
         start: this.space.start, 
         end: this.thumbs[0].isMultiple()
-          ? this.thumbs[1].value - this.step + this.thumbs[0].getSize() / 2 + this.space.start
-          : this.space.end + this.space.start
+          ? this.space.start + this.thumbs[1].value - this.step + this.thumbs[0].getSize() / 2
+          : this.space.end
         }
       : options.ownSpace = { 
         start: this.space.start + this.thumbs[0].value + this.step + this.thumbs[0].getSize() / 2, 
-        end: this.space.end + this.space.start
+        end: this.space.end
       };
   }  
 

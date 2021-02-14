@@ -1,0 +1,66 @@
+/* Scale */
+
+.scale {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  cursor: default;
+}
+
+.slider__horizontal .scale {
+  width: 100%;
+  min-width: 240px;
+  min-height: 10px;
+  top: 15px;
+  left: -0.5px;
+}
+
+.slider__vertical .scale {
+  flex-direction: column;
+  min-height: 240px;
+  height: 100%;
+  min-width: 30px;
+  left: 15px;
+  top: -0.5px;
+}
+
+.scale__mark {
+  position: relative;
+  font-size: 11px;
+}
+
+.scale__mark .mark-content {
+  position: relative;
+  cursor: pointer;
+  font-style: normal;
+}
+
+.scale__mark::before {
+  position: absolute;
+  content: "";
+  background-color: #ededb0;
+}
+
+.slider__horizontal .scale__mark::before {
+  height: 6px;
+  width: 1px;
+
+  top: -10px;
+  left: 0px;
+}
+
+.slider__vertical .scale__mark {
+  text-align: center;
+}
+
+.slider__vertical .mark-content {
+  top: -5.5px;
+}
+
+.slider__vertical .scale__mark::before {
+  height: 1px;
+  width: 6px;
+
+  top: 0px;
+  left: -10px;
+}

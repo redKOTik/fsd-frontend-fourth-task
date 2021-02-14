@@ -1,4 +1,13 @@
 import '@styles/app';
+import '@styles/settings';
+import '@styles/validator';
+
+import '@styles/components/workspace';
+import '@styles/components/progress-bar';
+import '@styles/components/scale';
+import '@styles/components/label';
+import '@styles/components/thumb';
+
 import './plugin/slider';
 
 const $slider = $('#slider');
@@ -8,9 +17,9 @@ $slider.sliderPlugin({
   step: '50',
   mode: 'Multiple',
   orientation: 'Vertical',
-  defaultValue: '550',
-  defaultInterval: ['150', '250'],
-  minimumValue: '100',
+  defaultValue: '350',
+  defaultInterval: ['100', '250'],
+  minimumValue: '-100',
   maximumValue: '500',
   showSettings: true,
   showValue: true,
@@ -21,15 +30,15 @@ $slider.sliderPlugin({
 
 // console.log($slider.sliderPlugin('value'));
 
-// $('#slider2').sliderPlugin({
-//   step: '5',
-//   mode: 'Single',
-//   orientation: 'Horizontal',
-//   defaultValue: '50',
-//   onValueChanged: function (_, change) {
-//     console.log(change);
-//   }
-// });
+$('#slider2').sliderPlugin({
+  step: '5',
+  mode: 'Single',
+  orientation: 'Horizontal',
+  defaultValue: '50',
+  onValueChanged: function (_, change) {
+    console.log(change);
+  }
+});
 
 $slider3.sliderPlugin({
   minimumValue: '40',
@@ -38,6 +47,7 @@ $slider3.sliderPlugin({
   mode: 'Single',
   orientation: 'Horizontal',
   defaultValue: '50',
+  defaultInterval: ['45', '55'],
   showScale: true,
   onValueChanged: function (_, change) {
     console.log(change);

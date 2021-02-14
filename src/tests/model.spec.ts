@@ -101,7 +101,7 @@ describe('Тестирование модели: ', () => {
   });
 
   // (number, number) => string
-  test('метод defineValueFromPixel должен переводить шаг из значения в пискелях в целое число и возвращать в виде строки. Значение должно округляться в меньшую сторону', () => {
+  test('метод defineValueFromPixel должен переводить шаг из значения в пискелях в целое число и возвращать в виде строки. Значение должно округляться в большую сторону', () => {
     let inputPositionValue = 200;
     let inputStepValue = 20;
 
@@ -114,7 +114,7 @@ describe('Тестирование модели: ', () => {
     inputStepValue = 80;
 
     outputValue = model.defineValueFromPixel(inputPositionValue, inputStepValue);
-    expect(outputValue).toEqual('12');
+    expect(outputValue).toEqual('13');
   });
 
   // string => number

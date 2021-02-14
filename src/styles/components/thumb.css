@@ -1,0 +1,29 @@
+/* Thumb */
+
+.thumb {
+  position: absolute;
+
+  width: 16px;
+  height: 16px;
+
+  outline: none;
+  cursor: pointer;
+
+  background: linear-gradient(180deg, #6fcf97 0%, #66d2ea 100%);
+  border: 2px solid #ffffff;
+  border-radius: 10px;
+
+  z-index: 1;
+}
+
+.thumb:focus {
+  border: 2px solid #06546b;
+}
+
+.slider__horizontal .thumb {
+  top: -6px;
+}
+
+.slider__vertical .thumb {
+  left: -6px;
+}

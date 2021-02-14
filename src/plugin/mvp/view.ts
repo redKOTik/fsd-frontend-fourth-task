@@ -88,12 +88,14 @@ class View implements IView {
 
   initWorkspace(options: ViewOptions): void {
     this.component
+      .computeOffset()
       .setDelta(calcDelta(options))
-      .computeSpace(+options.minimumValue)
+      .computeUnitMeasure()
+      .computeSpace(+options.maximumValue, +options.minimumValue)
       .setStep(
         convStepNumberToPixel(
           +options.step,
-          this.component.getUnitMeasure())
+          this.component.unit)
       );
   }
 
@@ -103,7 +105,7 @@ class View implements IView {
       .setOnElementDefaultPosition(
         convValueNumberToPixel(
           +value,
-          this.component.getUnitMeasure(),
+          this.component.unit,
           +options.minimumValue))
       .checkShowValue(options.showValue)
       .onDragStartHandler()
@@ -162,9 +164,8 @@ class View implements IView {
   mousemoveHandler: HandleEvent = (options: HandleOptions, event: MouseEvent) => {
     const { shift, index } = options;    
     this.component.computeOwnSpace(index, options);
-            
     const position = this.component.space.start + event[this.component.styleKeys.client] - shift - this.component.getPropValueFromCoordinates(this.component.element); // start + clickEvent.clientX - shift - workspace.offsetLeft
-    const newOffsetPosition = this.component.computeNewOffsetPosition(position, options);
+    const newOffsetPosition = this.component.computeNewOffsetPosition(position, options);   
     this.component.thumbs[index].setOnElementDefaultPosition(newOffsetPosition);
     this.emmitter.dispatch('view:thumb-moved', { position: newOffsetPosition, index, step: this.component.step });
   }
@@ -224,20 +225,20 @@ class View implements IView {
     //this.reHangEventListeners();
   }
 
-  updateThumb(thumb: Thumb, value: string): void {    
+  updateThumb(thumb: Thumb, value: string): void {
     thumb
       .setOnElementDefaultValue(value)
       .setOnElementDefaultPosition(
         convValueNumberToPixel(
           +value,
-          this.component.getUnitMeasure(),
+          this.component.unit,
           +this.options.minimumValue))
       .initLabel()
   }
 
   // model handlers
 
-  handleValueChanged: (data: DispatchData) => void = (data: DispatchData) => {    
+  handleValueChanged: (data: DispatchData) => void = (data: DispatchData) => {
     Object.keys(data).forEach(key => {
       switch (key) {
         case 'defaultValue':
@@ -299,7 +300,7 @@ class View implements IView {
     this.component.setStep(
       convStepNumberToPixel(
         +this.options.step,
-        this.component.getUnitMeasure()));  
+        this.component.unit));  
   }
 }
 

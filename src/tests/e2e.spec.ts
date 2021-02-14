@@ -73,7 +73,7 @@ test('тестирование изменения значения настро�
 
 test('тестирование ограничений рабочей зоны слайдера после изменения настроек минимума, максимума', async () => {
     
-    const minvalue = '200';
+    const minvalue = '-50';
     const maxvalue = '400';
 
     const section = await page.$('#first');
@@ -91,9 +91,13 @@ test('тестирование ограничений рабочей зоны с
     let inputMax = await settings.$('.range[name="maximum"]');
 
     await inputMin.evaluate((node: HTMLInputElement) => node['value'] = '');
-    await inputMax.evaluate((node: HTMLInputElement) => node['value'] = '');
     await inputMin.type(minvalue);
+
+    await inputMax.evaluate((node: HTMLInputElement) => node['value'] = '');    
     await inputMax.type(maxvalue);
+
+    await page.mouse.move(500, 500); // перемещаем
+    await page.mouse.click(500, 500);
 
     await mousemove(thumbFisrt, 451, 81);
     await mousemove(thumbSecond, 451, 560);

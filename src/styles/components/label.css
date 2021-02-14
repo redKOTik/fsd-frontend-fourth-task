@@ -1,0 +1,12 @@
+/* Label */
+
+.label {
+  position: absolute;
+  font-size: 0.8em;
+  user-select: none;
+  cursor: default;
+}
+
+.slider__horizontal .label {
+  top: -1.5rem;
+}

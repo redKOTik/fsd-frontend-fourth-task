@@ -152,7 +152,7 @@ class Model implements IModel {
   }
 
   defineValueFromPixel(position: number, step: number): string {
-    return `${Math.floor(position / step * +this.options.step)}`;
+    return `${Math.round(position / step * +this.options.step)}`;
   }
 
   defineIndexMutableValue(value: string): number {

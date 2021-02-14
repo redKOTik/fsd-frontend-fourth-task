@@ -4,8 +4,8 @@ function calcDelta(options: ViewOptions): number {
   return +options.maximumValue - +options.minimumValue;
 }
 
-function stepBalancing(change: number, step: number, start: number): number {
-  const balance = (change - start) % step;
+function stepBalancing(change: number, step: number): number {
+  const balance = change % step;
   if (step / 2 <= balance) {
     return change + (step - balance);
   } else {
@@ -18,7 +18,7 @@ function convStepNumberToPixel(step: number, unitMeasure: number): number {
 }
 
 function convValueNumberToPixel(value: number, unitMeasure: number, minimumValue: number): number {
-  return Math.round((value * unitMeasure) - (minimumValue * unitMeasure));
+  return (value * unitMeasure) - (minimumValue * unitMeasure);
 }
 
 // функции для создания и обновления вида настроек

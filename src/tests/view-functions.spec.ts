@@ -29,9 +29,8 @@ describe('Тестирование вспомогательных функций
     test('проверка функции stepBalancing', () => {
         const inputChange = 10;
         const inputStep = 10;
-        const inputStart = 10;
 
-        expect(helper.stepBalancing(inputChange, inputStep, inputStart)).toBe(10);
+        expect(helper.stepBalancing(inputChange, inputStep)).toBe(10);
     });
 
     // (number, number) => number
