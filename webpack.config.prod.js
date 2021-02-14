@@ -28,16 +28,16 @@ const optimization = () => {
 module.exports = {
     context: path.resolve(__dirname, 'src'),
     mode: 'production',
-    //entry: './app.ts',
-    entry: './plugin/slider.ts',
+    entry: './app.ts',
+    //entry: './plugin/slider.ts',
     output: {
        filename: 'bundle.js',
        path: path.resolve(__dirname, 'dist'),
-       libraryTarget: 'umd',
-       umdNamedDefine: true
+       //libraryTarget: 'umd',
+       //umdNamedDefine: true
     },
     optimization: optimization(),
-    externals: /^(jquery|\$)$/i,
+    //externals: /^(jquery|\$)$/i,
     devtool: 'none',
     resolve: {
         // Add `.ts` and `.tsx` as a resolvable extension.
