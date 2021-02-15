@@ -58,7 +58,7 @@ test('тестирование изменения значения настро�
     const settings = await section.$('.settings');
 
     const thumb = await slider.$('.thumb:first-of-type');
-    const label = await slider.$('.label:first-of-type');    
+    const label = await slider.$('.slider-label:first-of-type');    
 
     await mousemove(thumb, 451, 200);
 
@@ -82,8 +82,8 @@ test('тестирование ограничений рабочей зоны с
 
     const thumbFisrt = await slider.$('.thumb:first-of-type');
     const thumbSecond = await slider.$('.thumb:last-of-type');
-    const labelFirst = await slider.$('.label:first-of-type');    
-    const labelSecond = await slider.$('.label:last-of-type');
+    const labelFirst = await slider.$('.slider-label:first-of-type');    
+    const labelSecond = await slider.$('.slider-label:last-of-type');
 
     await mousemove(thumbFisrt, 451, 200);
 

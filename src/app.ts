@@ -28,7 +28,7 @@ $slider.sliderPlugin({
   }
 });
 
-// console.log($slider.sliderPlugin('value'));
+//console.log($slider.sliderPlugin('value'));
 
 $('#slider2').sliderPlugin({
   step: '5',

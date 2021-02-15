@@ -41,7 +41,7 @@ class Thumb extends Component {
       .initLabel()
       .renderLabel();
      return this;
-    } else if (this.element.parentNode?.querySelector('.label')) {
+    } else if (this.element.parentNode?.querySelector('.slider-label')) {
       this.label.destroy(); 
     }
     return this;

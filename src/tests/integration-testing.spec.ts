@@ -114,11 +114,11 @@ describe('Интеграционное тестирование компонен
     showValueInput.checked = inputValue;
 
     expect(modelOptions.showValue).not.toBe(inputValue);
-    expect(presentor.view?.$view.find('.label').length).toBe(0);
+    expect(presentor.view?.$view.find('.slider-label').length).toBe(0);
 
     showValueInput.dispatchEvent(event);
     expect(modelOptions.showValue).toBe(inputValue);
-    expect(presentor.view?.$view.find('.label').length).toBe(1);
+    expect(presentor.view?.$view.find('.slider-label').length).toBe(1);
   });
 
   test('проверить изменение данных модели после изменения настроек вида (изменение вида)', () => {

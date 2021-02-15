@@ -179,7 +179,18 @@ class View implements IView {
   onMousedownThumbHandler(thumb: Thumb, mousemoveHandler: HandleEvent, context: Workspace): void {
     thumb.setMouseDownHandler(thumb.makeMouseDownHandler(mousemoveHandler, context));
     thumb.element.addEventListener('mousedown', thumb.mouseDownHandler);
-  }  
+  }
+  
+  customEventTriggered(): void {
+    const measurement = this.options.measurement ? this.options.measurement : '';
+    let values = '';
+    if (this.options.mode === 'Single') {
+      values = this.options.defaultValue + measurement;
+    } else {
+      values = this.options.defaultInterval[0] + measurement + ' - ' + this.options.defaultInterval[1] + measurement;         
+    }
+    this.$view.trigger('value-change', values);
+  }
 
   // methods view update
 
@@ -259,6 +270,10 @@ class View implements IView {
               this.updateThumb(this.component.thumbs[params['index']], this.options.defaultInterval[params['index']]);
             }
           break;
+      }
+
+      if (typeof (this.options.onValueChanged) === 'function') {
+        this.customEventTriggered();
       }
     });    
     this.initProgressBarElement();

@@ -41,11 +41,11 @@ function createSettings(): HTMLDivElement {
                 <legend>Вид слайдера</legend>
                 <label>
                     <input class="view" type="radio" name="view" value="Horizontal" />
-                    <div class="label">Горизонтально</div>
+                    <div class="view-label">Горизонтально</div>
                 </label>
                 <label>
                     <input class="view" type="radio" name="view" value="Vertical" />
-                    <div class="label">Вертикально</div>
+                    <div class="view-label">Вертикально</div>
                 </label>                
             </fieldset>
         </div>
@@ -54,11 +54,11 @@ function createSettings(): HTMLDivElement {
                 <legend>Режим</legend>
                 <label>
                     <input class="mode" type="radio" name="mode" value="Single" />
-                    <div class="label">Single</div>
+                    <div class="mode-label">Single</div>
                 </label>
                 <label>
                     <input class="mode" type="radio" name="mode" value="Multiple" />
-                    <div class="label">Multiple</div>
+                    <div class="mode-label">Multiple</div>
                 </label>                
             </fieldset>            
         </div>

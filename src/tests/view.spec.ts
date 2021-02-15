@@ -97,7 +97,7 @@ describe('Тестирование вида слайдера: ', () => {
       }
 
       if (options.showValue) {
-        const $label = view?.$view.find('.label');
+        const $label = view?.$view.find('.slider-label');
         expect($label).toBeDefined();
         
         if ($label.length > 1) {

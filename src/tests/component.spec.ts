@@ -52,7 +52,7 @@ describe('Тестирование Label: ', () => {
   });
 
   test('проверка метода destroy', () => {
-    testComponentDestroy(label, '.label');
+    testComponentDestroy(label, '.slider-label');
   });
 });
 

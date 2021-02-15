@@ -17,7 +17,7 @@ class Label extends Component {
   }
 
   create(): HTMLSpanElement {
-    return createElement('span', 'label') as HTMLSpanElement;
+    return createElement('span', 'slider-label') as HTMLSpanElement;
   }
   
   setTextContent(text: string): this {

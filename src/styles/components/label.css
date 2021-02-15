@@ -1,12 +1,12 @@
 /* Label */
 
-.label {
+.slider-label {
   position: absolute;
   font-size: 0.8em;
   user-select: none;
   cursor: default;
 }
 
-.slider__horizontal .label {
+.slider__horizontal .slider-label {
   top: -1.5rem;
 }

@@ -88,8 +88,8 @@
   transition: 0.2s;
 }
 
-.view + .label,
-.mode + .label {
+.view + .view-label,
+.mode + .mode-label {
   font: 12px Georgia;
   line-height: 15px;
   margin-bottom: 5px;
@@ -104,8 +104,8 @@
   opacity: 0;
 }
 
-.view + .label,
-.mode + .label {
+.view + .view-label,
+.mode + .mode-label {
   position: relative;
   cursor: pointer;
   padding: 0 0 0 50px;
@@ -113,8 +113,8 @@
   line-height: 24px;
 }
 
-.view + .label:before,
-.mode + .label:before {
+.view + .view-label:before,
+.mode + .mode-label:before {
   content: "";
   position: absolute;
   width: 20px;
@@ -126,8 +126,8 @@
   top: 0px;
 }
 
-.view + .label:after,
-.mode + .label:after {
+.view + .view-label:after,
+.mode + .mode-label:after {
   content: "";
   position: absolute;
   width: 12px;
@@ -140,14 +140,14 @@
   top: 5px;
 }
 
-.view:checked + .label:before,
-.mode:checked + .label:before {
+.view:checked + .view-label:before,
+.mode:checked + .mode-label:before {
   border: 1px solid goldenrod;
   transition: 0.2s;
 }
 
-.view:checked + .label:after,
-.mode:checked + .label:after {
+.view:checked + .view-label:after,
+.mode:checked + .mode-label:after {
   opacity: 1;
   transition: 0.2s;
 }
