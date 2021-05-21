@@ -77,7 +77,7 @@
     step: string,
     orientation: 'Vertical' | 'Horizontal',
     mode: 'Single' | 'Multiple',
-    onValueChanged: Function | undefined;
+    onValueChanged: Function | undefined,
     measurement: string
   } 
 
